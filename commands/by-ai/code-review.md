@@ -21,11 +21,32 @@ Execute comprehensive code analysis across quality, security, performance, and a
 - `--format` - Output format (text, json, report)
 
 ## Execution
-1. Discover and categorize files for analysis based on the last commit of the git repository
-2. Apply appropriate analysis tools and techniques
+1. Discover and categorize files for analysis based on the diff between the current branch and development:
+    - Use `git diff development...$(git branch --show-current)`
+2. Apply appropriate analysis tools and techniques:
+    - **Quality**: Code style, complexity, maintainability
+    - **Security**: Vulnerability scanning, dependency checks
+    - **Performance**: Profiling, bottleneck identification
+    - **Architecture**: Design patterns, modularity, scalability
 3. Generate findings with severity ratings
-4. Create actionable recommendations with priorities
-5. Present comprehensive analysis report
+4. Create actionable recommendations with priorities, only if issues are found
+    - High: Critical issues that must be addressed immediately
+    - Medium: Important issues that should be resolved soon
+    - Low: Minor issues that can be addressed later
+    - List should be sorted by severity
+    - Include file project root relative filepaths and line numbers for each issue
+5. Present ONLY a nicely formatted compact markdown table of text-based analysis report nothing else
+    - If you have positive findings, just add a tick mark next to the section that you used as a point to review
+    - Start with the positive findings and then list the improvements at the end
+    - Only include list of improvements
+    - Include:
+      - File paths in a following format: `./path/to/file.js:line_number` (DO NOT include ranges just where the issue
+        is)
+      - Issues found
+      - Severity
+      - Recommendations
+
+DO NOT include any other text, explanations, or comments outside the markdown table.
 
 ## Claude Code Integration
 - Uses Glob for systematic file discovery
