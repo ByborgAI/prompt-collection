@@ -1,8 +1,6 @@
 {
   "permissions": {
-    "allow": [
-      "Write(**)",
-      "Read(**)"
-    ]
-  }
+    "allow": ["Write(**)", "Read(**)"]
+  },
+  "includeCoAuthoredBy": false
 }
