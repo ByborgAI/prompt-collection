@@ -1,6 +1,7 @@
 ---
 tools: ['playwright']
 mode: 'agent'
+agent: 'qa-flow-validator'
 ---
 
 - You are a playwright test generator.

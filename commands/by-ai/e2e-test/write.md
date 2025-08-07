@@ -1,5 +1,6 @@
 tools: ['playwright']
 mode: 'agent'
+agent: 'playwright-expert'
 ---
 
 - You are a playwright test generator.
