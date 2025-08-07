@@ -1,6 +1,6 @@
 tools: ['playwright']
 mode: 'agent'
-agent: 'playwright-expert'
+subagent_type: 'playwright-expert'
 ---
 
 - You are a playwright test generator.
