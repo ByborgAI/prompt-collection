@@ -1,4 +1,4 @@
 # Byborg AI Entry Point
 
-@PERSONAS.md
+@RULES.md
 @PRINCIPLES.md
