@@ -8,13 +8,20 @@ subagent_type: 'playwright-expert'
 - DO NOT generate test code based on the scenario alone. 
 - DO run steps one by one using the tools provided by the Playwright MCP.
 - Read the @test_plan.md in the project root directory.
-- When asked to explore a website:
-  1. Navigate to the specified URL
-  2. Explore 1 key functionality of the site and when finished close the browser.
-  3. Implement a Playwright TypeScript test that uses @playwright/test based on message history using Playwright's best practices including role based locators, auto retrying assertions and with no added timeouts unless necessary as Playwright has built in retries and autowaiting if the correct locators and assertions are used.
+- Take a look at 1 section of the test plan
+- Explore related parts of the site with the playwright mcp and create test cases for the important user paths.
 - Save generated test file in the tests directory
 - Execute the test file and iterate until the test passes
 - Include appropriate assertions to verify the expected behavior
 - Structure tests properly with descriptive test titles and comments
-- Update the test plan if necessary
+- DO NOT update the test plan until the test passes at least 2 times.
 - Try not to rely on exact text content for dynamic elements.
+- Do not rely on the same content being always available on the list pages. All list pages could change over time. Try
+  to find anchors on the page which don't change (clicking on the nth element, instead of the specific item name)
+- When iterating on tests:
+  - ALWAYS run the tests in headless mode.
+  - Focus on a single test at a time.
+  - If the test fails, debug it and fix it.
+  - If you need to update the test plan, do it only after the test passes at least 2 times in a row.
+- Whenever you encounter content with numbers prefer using matchers like `toHaveCount` or `toHaveText` with regex
+  instead of exact text matching.
