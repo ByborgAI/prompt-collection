@@ -3,7 +3,7 @@
 # Claude Code Session Initialization Script
 # Checks for git submodule updates and notifies user
 
-CLAUDE_DIR="$HOME/.claude"
+CLAUDE_DIR=".claude"
 SCRIPT_NAME="session-init"
 
 # Colors for output
