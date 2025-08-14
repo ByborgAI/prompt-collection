@@ -106,8 +106,9 @@ main() {
         local last_update=$(echo "$update_info" | cut -d'|' -f2)
         
         echo ""
+        warn ""
         warn "╭─────────────────────────────────────╮"
-        warn "│  ByborgAI Config Updates Available!   │"
+        warn "│  ByborgAI Config Updates Available! │"
         warn "╰─────────────────────────────────────╯"
         warn ""
         warn "Your .claude configuration is $commits_behind commits behind"
@@ -115,6 +116,7 @@ main() {
         warn ""
         warn "Or update the parent repository submodule:"
         warn "  git submodule update --remote .claude"
+        warn ""
         echo ""
     fi
 }
