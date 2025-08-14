@@ -107,20 +107,15 @@ main() {
         
         echo ""
         warn "╭─────────────────────────────────────╮"
-        warn "│  Claude Config Updates Available!   │"
+        warn "│  ByborgAI Config Updates Available!   │"
         warn "╰─────────────────────────────────────╯"
         warn ""
         warn "Your .claude configuration is $commits_behind commits behind"
         warn "Last update: $last_update"
         warn ""
-        warn "To update your configuration:"
-        warn "  cd ~/.claude && git pull origin"
-        warn ""
         warn "Or update the parent repository submodule:"
         warn "  git submodule update --remote .claude"
         echo ""
-    else
-        success "Claude configuration is up to date"
     fi
 }
 
