@@ -17,7 +17,7 @@ This repository provides a structured framework for AI-driven development using 
 
 1. **Clone or add as submodule** to your project's `.claude` directory:
    ```bash
-   git submodule add https://github.com/ByborgCopilot/byborgai-prompt-collection .claude
+   git submodule add git@github.com:ByborgCopilot/byborgai-prompt-collection.git .claude
    ```
 
 2. **GitHub Integration** (Optional): Follow [GITHUB.md](GITHUB.md) for Claude's native GitHub app setup
@@ -67,20 +67,6 @@ The `scripts/session-init.sh` automatically runs on session start to:
 - Notify about available submodule updates
 - Provide update instructions
 
-## Key Features
-
-### Development Philosophy
-- **Evidence-Based**: All decisions backed by measurable data
-- **Task-First Approach**: Structure before execution (understand → plan → execute → validate)
-- **Parallel Thinking**: Maximize efficiency through intelligent batching
-- **Quality Gates**: Multi-step validation for all operations
-
-### Operational Excellence
-- **Systematic Codebase Changes**: Mandatory project-wide discovery before modifications
-- **Security-First**: Always validate inputs and use secure practices
-- **Framework Compliance**: Respect existing project patterns and conventions
-- **Context Retention**: Maintain ≥90% context retention across operations
-
 ## Usage Patterns
 
 ### Basic Command Usage
@@ -110,22 +96,17 @@ With the GitHub app installed, mention `@claude` in PRs and issues:
 4. **Follow Framework Patterns**: Respect existing project conventions
 5. **Complete Discovery**: Perform comprehensive searches before codebase changes
 
-## Contributing
+## Pre-commit Hook Installation
 
-This collection follows the established patterns and principles outlined in the core framework files. When adding new commands or agents:
+This repository includes an automated pre-commit hook that runs code reviews before commits:
 
-1. Follow the existing file structure and naming conventions
-2. Adhere to the principles in [PRINCIPLES.md](PRINCIPLES.md)
-3. Apply the operational rules from [RULES.md](RULES.md)
-4. Test with real development scenarios
+1. **Install the pre-commit hook**:
+   ```bash
+   ./scripts/install-pre-commit-hook.sh
+   ```
 
-## Support
-
-For issues or questions:
-- Check the [troubleshooting section](https://docs.anthropic.com/en/docs/claude-code/troubleshooting) in Claude Code docs
-- Review existing command and agent patterns for similar use cases
-- Ensure proper setup of GitHub integration if using collaborative features
-
-## License
-
-This collection is designed to enhance development workflows with Claude Code and follows Anthropic's usage guidelines for AI-assisted development.
+2. **What it does**:
+   - Automatically runs `/by-ai:code-review` on staged changes before each commit
+   - Works with both regular repositories and submodule installations
+   - Prompts for confirmation after showing review results
+   - Can be bypassed with `git commit --no-verify` if needed
