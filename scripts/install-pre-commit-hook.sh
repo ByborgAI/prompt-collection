@@ -35,6 +35,20 @@ if ! command -v claude &> /dev/null; then
     exit 1
 fi
 
+# Prompt for branch name to diff against
+echo ""
+echo "🌿 Which branch should be used for code review comparisons?"
+echo "   Common options: main, master, develop"
+echo -n "   Enter branch name (default: main): "
+read -r BRANCH_NAME < /dev/tty
+
+# Set default if empty
+if [ -z "$BRANCH_NAME" ]; then
+    BRANCH_NAME="main"
+fi
+
+echo "   Using branch: $BRANCH_NAME"
+
 # Check if existing pre-commit hook exists and backup if needed
 if [ -f "$HOOK_TARGET" ]; then
     BACKUP_FILE="${HOOK_TARGET}.backup.$(date +%Y%m%d_%H%M%S)"
@@ -45,7 +59,7 @@ if [ -f "$HOOK_TARGET" ]; then
 fi
 
 # Create the pre-commit hook content
-cat > "$HOOK_TARGET" << 'EOF'
+cat > "$HOOK_TARGET" << EOF
 #!/bin/bash
 
 # Pre-commit hook to run by-ai code review with claude -p before committing
@@ -57,8 +71,8 @@ echo "🤖 Running claude command /by-ai:code-review before commit..."
 echo "----------------------------------------"
 
 # Run the by-ai code review command with claude -p
-if claude -p "$(cat <<'REVIEW_EOF'
-/by-ai:code-review master --depth quick --format text
+if claude -p "\\\$(cat <<'REVIEW_EOF'
+/by-ai:code-review $BRANCH_NAME --depth quick --format text
 REVIEW_EOF
 )"; then
     echo "----------------------------------------"
@@ -116,7 +130,7 @@ echo ""
 echo "🗑️  To uninstall the hook:"
 echo "   rm $HOOK_TARGET"
 
-if [ -f "${HOOK_TARGET}.backup."* ]; then
+if ls "${HOOK_TARGET}.backup."* 1> /dev/null 2>&1; then
     echo ""
     echo "📁 Your previous hook was backed up and can be restored if needed"
 fi
