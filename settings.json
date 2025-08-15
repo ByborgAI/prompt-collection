@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./.claude/scripts/session-init.sh"
+            "command": "bash -c 'SCRIPT_PATH=\"\"; if [ -f \"./.claude/scripts/session-init.sh\" ]; then SCRIPT_PATH=\"./.claude/scripts/session-init.sh\"; elif [ -f \"./scripts/session-init.sh\" ]; then SCRIPT_PATH=\"./scripts/session-init.sh\"; elif [ -f \"$HOME/.claude/scripts/session-init.sh\" ]; then SCRIPT_PATH=\"$HOME/.claude/scripts/session-init.sh\"; else echo \"[hook] session-init.sh not found\"; exit 1; fi; exec \"$SCRIPT_PATH\"'"
           }
         ]
       }
