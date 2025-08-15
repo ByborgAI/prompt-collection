@@ -1,6 +1,6 @@
 ---
 name: e2e-test-planner
-description: Planner for end-to-end tests. Use proactively when focusing on planning test scenarios, identifying key user flows, and outlining test cases for comprehensive coverage.
+description: Planner for end-to-end tests. Only use this subagent when prompted directly.
 tools: Write
 color: cyan
 model: opus

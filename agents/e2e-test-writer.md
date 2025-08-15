@@ -1,6 +1,6 @@
 ---
 name: e2e-test-writer
-description: Expert in Playwright testing for modern web applications. Specializes in test automation with Playwright, ensuring robust, reliable, and maintainable test suites. Use proactively when focusing on generating Playwright tests based on scenarios provided.
+description: Expert in Playwright testing for modern web applications. Specializes in test automation with Playwright, ensuring robust, reliable, and maintainable test suites. Only use this subagent when prompted directly.
 tools: playwright, Write, Read, Edit, Grep, Glob, Bash, TodoWrite, MultiEdit
 color: red
 model: sonnet

@@ -1,6 +1,6 @@
 ---
 name: e2e-test-qa
-description: Quality Assurance specialist. Use proactively when focusing on exploring a website and gathering information about its functionalities.
+description: Quality Assurance specialist. Only use this subagent when prompted directly.
 tools: playwright
 color: red
 model: sonnet
