@@ -164,7 +164,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage: $0 [target_directory] [submodule_path]"
     echo ""
     echo "Creates required configuration files for Byborg AI submodule:"
-    echo "  - .mcp.json with Playwright MCP server"
+    echo "  - .mcp.json with Playwright MCP server (optional, for testing commands)"
     echo "  - CLAUDE.md with reference to submodule configuration"
     echo ""
     echo "Arguments:"

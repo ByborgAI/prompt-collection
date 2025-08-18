@@ -10,6 +10,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "/by-ai:(manual-test|e2e-test)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'SCRIPT_PATH=\"\"; if [ -f \"./.claude/scripts/check-mcp-for-testing.sh\" ]; then SCRIPT_PATH=\"./.claude/scripts/check-mcp-for-testing.sh\"; elif [ -f \"./scripts/check-mcp-for-testing.sh\" ]; then SCRIPT_PATH=\"./scripts/check-mcp-for-testing.sh\"; elif [ -f \"$HOME/.claude/scripts/check-mcp-for-testing.sh\" ]; then SCRIPT_PATH=\"$HOME/.claude/scripts/check-mcp-for-testing.sh\"; else echo \"[hook] check-mcp-for-testing.sh not found\"; exit 1; fi; exec \"$SCRIPT_PATH\"'"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
