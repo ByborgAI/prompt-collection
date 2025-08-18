@@ -133,11 +133,66 @@ check_claude_md_reference() {
     return 0
 }
 
+# Check if required MCP servers are available
+check_required_mcp_servers() {
+    local mcp_config=".mcp.json"
+    
+    if [ ! -f "$mcp_config" ]; then
+        warn ""
+        warn "╭─────────────────────────────────────╮"
+        warn "│      Missing MCP Configuration!     │"
+        warn "╰─────────────────────────────────────╯"
+        warn ""
+        warn "No .mcp.json found in project root."
+        warn "This project requires the Playwright MCP server."
+        warn ""
+        warn "Create .mcp.json with the following content:"
+        warn '{'
+        warn '  "mcpServers": {'
+        warn '    "playwright": {'
+        warn '      "type": "stdio",'
+        warn '      "command": "npx",'
+        warn '      "args": ["@playwright/mcp@latest"],'
+        warn '      "env": {}'
+        warn '    }'
+        warn '  }'
+        warn '}'
+        warn ""
+        return 1
+    fi
+    
+    # Check if playwright server is configured
+    if ! grep -q '"playwright"' "$mcp_config" 2>/dev/null; then
+        warn ""
+        warn "╭─────────────────────────────────────╮"
+        warn "│    Missing Playwright MCP Server!   │"
+        warn "╰─────────────────────────────────────╯"
+        warn ""
+        warn "Your .mcp.json doesn't include the required"
+        warn "Playwright MCP server configuration."
+        warn ""
+        warn "Add this to your mcpServers section:"
+        warn '    "playwright": {'
+        warn '      "type": "stdio",'
+        warn '      "command": "npx",'
+        warn '      "args": ["@playwright/mcp@latest"],'
+        warn '      "env": {}'
+        warn '    }'
+        warn ""
+        return 1
+    fi
+    
+    return 0
+}
+
 # Main execution
 main() {
     # Always check for CLAUDE.md existence and proper referencing first
     check_claude_md_exists
     check_claude_md_reference
+    
+    # Check for required MCP server configuration
+    check_required_mcp_servers
     
     # Only proceed with git checks if git repo exists
     if ! check_git_repo; then
