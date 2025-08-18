@@ -33,6 +33,22 @@ This repository provides a structured framework for AI-driven development using 
 
    Add `.playwright-mcp` to your `.gitignore` file to avoid committing the Playwright MCP testing screenshots and videos.
 
+4. **Atlassian MCP Setup** (Optional): integrate with Atlassian products like Jira and Confluence by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
+
+   ```bash
+   # Add Atlassian MCP to your project mcp config
+   claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse --scope project
+   # Connect Atlassian MCP
+   claude "/mcp"
+   ```
+
+   This will allow you to use the Atlassian MCP for tasks like reading Jira issues or Confluence pages. Example usage:
+   ```bash
+   claude "Fix the issue described here: [link-to-jira-issue]"
+   ```
+
+   You can also ask Claude to create, update, comment, or bulk edit Jira issues or Confluence pages using the Atlassian MCP.
+
 ### Core Framework Files
 
 - **[CLAUDE.md](CLAUDE.md)**: Entry point referencing core rules and principles
