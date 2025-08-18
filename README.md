@@ -22,6 +22,17 @@ This repository provides a structured framework for AI-driven development using 
 
 2. **GitHub Integration** (Optional): Follow [GITHUB.md](GITHUB.md) for Claude's native GitHub app setup
 
+3. **Playwright MCP Setup** for browser interactions and testing: install by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
+      
+   ```bash
+   # Add Playwright MCP to your project mcp config
+   claude mcp add playwright npx @playwright/mcp@latest --scope project
+   # Connect Playwright MCP
+   claude "/mcp"
+   ```
+
+   Add `.playwright-mcp` to your `.gitignore` file to avoid committing the Playwright MCP testing screenshots and videos.
+
 ### Core Framework Files
 
 - **[CLAUDE.md](CLAUDE.md)**: Entry point referencing core rules and principles
@@ -37,6 +48,7 @@ Commands are located in the `commands/by-ai/` directory and provide structured p
 - **[code-review.md](commands/by-ai/code-review.md)**: Comprehensive code review guidelines
 - **[write-unit-tests.md](commands/by-ai/write-unit-tests.md)**: Unit test generation and best practices
 - **[commit.md](commands/by-ai/commit.md)**: Automated commit message generation and validation
+- **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production
 
 ### E2E Testing Workflow
 - **[e2e-test/plan.md](commands/by-ai/e2e-test/plan.md)**: End-to-end test planning strategies
