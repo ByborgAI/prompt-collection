@@ -2,7 +2,7 @@
 name: auto-committer
 description: Use this agent when you need to automatically analyze current repository changes and generate conventional commit messages. Examples: <example>Context: User has made changes to multiple files and wants to commit them with a proper message. user: '/by-ai:commit' assistant: 'I'll use the auto-committer agent to analyze your changes and create a commit message' <commentary>The user is requesting the commit command, so use the auto-committer agent to analyze staged/unstaged changes and generate an appropriate conventional commit message.</commentary></example> <example>Context: User has been working on a feature and wants to commit with proper formatting. user: 'I've finished implementing the user authentication system, can you commit this for me?' assistant: 'I'll use the auto-committer agent to analyze your authentication changes and create a proper commit' <commentary>User wants to commit their work, so use the auto-committer agent to review the changes and generate a conventional commit message.</commentary></example>
 tools: Bash, Glob, Grep, LS, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
-model: haiku
+model: sonnet
 color: cyan
 ---
 
