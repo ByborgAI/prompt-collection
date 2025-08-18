@@ -29,62 +29,38 @@ success() {
     echo -e "${GREEN}[${SCRIPT_NAME}]${NC} $1"
 }
 
-# Check if Playwright MCP server is configured
+# Check if Playwright MCP server is configured and working
 check_playwright_mcp() {
-    local mcp_config=".mcp.json"
+    log "Checking Playwright MCP server status..."
     
-    # Check if .mcp.json exists
-    if [ ! -f "$mcp_config" ]; then
+    # Use claude mcp get to check if playwright is properly configured
+    local mcp_output
+    mcp_output=$(claude mcp get playwright 2>&1)
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ]; then
+        success "✓ Playwright MCP server is configured and working"
+        return 0
+    else
         error ""
         error "╭─────────────────────────────────────────────╮"
-        error "│        MCP Server Required for Testing      │"
+        error "│        Playwright MCP Server Required       │"
         error "╰─────────────────────────────────────────────╯"
         error ""
-        error "This command requires the Playwright MCP server."
-        error "Please create .mcp.json with the following content:"
+        error "This testing command requires the Playwright MCP server."
+        error "The server is either not configured or not working properly."
         error ""
-        error '{'
-        error '  "mcpServers": {'
-        error '    "playwright": {'
-        error '      "type": "stdio",'
-        error '      "command": "npx",'
-        error '      "args": ["@playwright/mcp@latest"],'
-        error '      "env": {}'
-        error '    }'
-        error '  }'
-        error '}'
+        error "To set it up, run:"
+        error "  claude mcp add playwright npx @playwright/mcp@latest"
         error ""
-        error "Then install the Playwright MCP server:"
-        error "  npm install -g @playwright/mcp"
+        error "Or to install globally:"
+        error "  claude mcp add playwright npx @playwright/mcp@latest --scope global"
+        error ""
+        error "MCP check output:"
+        error "$mcp_output"
         error ""
         return 1
     fi
-    
-    # Check if playwright server is configured
-    if ! grep -q '"playwright"' "$mcp_config" 2>/dev/null; then
-        error ""
-        error "╭─────────────────────────────────────────────╮"
-        error "│     Playwright MCP Server Not Configured    │"
-        error "╰─────────────────────────────────────────────╯"
-        error ""
-        error "This command requires the Playwright MCP server."
-        error "Please add this to your .mcp.json mcpServers section:"
-        error ""
-        error '    "playwright": {'
-        error '      "type": "stdio",'
-        error '      "command": "npx",'
-        error '      "args": ["@playwright/mcp@latest"],'
-        error '      "env": {}'
-        error '    }'
-        error ""
-        error "Then install the Playwright MCP server:"
-        error "  npm install -g @playwright/mcp"
-        error ""
-        return 1
-    fi
-    
-    success "✓ Playwright MCP server is configured"
-    return 0
 }
 
 # Main execution
