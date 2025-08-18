@@ -87,9 +87,59 @@ get_update_info() {
     echo "$commits_behind|$last_update"
 }
 
+# Check if CLAUDE.md exists in project root
+check_claude_md_exists() {
+    if [ ! -f "CLAUDE.md" ]; then
+        error ""
+        error "╭─────────────────────────────────────╮"
+        error "│       Missing CLAUDE.md File!       │"
+        error "╰─────────────────────────────────────╯"
+        error ""
+        error "No CLAUDE.md found in project root folder."
+        error "This file is essential for Claude Code to understand"
+        error "project instructions and context."
+        error ""
+        error "If using this as a submodule, create CLAUDE.md that"
+        error "references the submodule configuration:"
+        error "  echo '@.claude/CLAUDE.md' > CLAUDE.md"
+        error ""
+        return 1
+    fi
+    return 0
+}
+
+# Check if CLAUDE.md properly references submodule config
+check_claude_md_reference() {
+    if [ -f "CLAUDE.md" ] && [ -f "$CLAUDE_DIR/CLAUDE.md" ]; then
+        # Check if CLAUDE.md contains reference to .claude/CLAUDE.md
+        if ! grep -q "@\\.claude/CLAUDE\\.md\\|@$CLAUDE_DIR/CLAUDE\\.md" "CLAUDE.md" 2>/dev/null; then
+            warn ""
+            warn "╭─────────────────────────────────────╮"
+            warn "│    CLAUDE.md Reference Warning!     │"
+            warn "╰─────────────────────────────────────╯"
+            warn ""
+            warn "Your CLAUDE.md does not reference the submodule"
+            warn "configuration at .claude/CLAUDE.md"
+            warn ""
+            warn "Consider adding this line to your CLAUDE.md:"
+            warn "  @.claude/CLAUDE.md"
+            warn ""
+            warn "This ensures Claude Code reads both the project"
+            warn "and submodule configurations properly."
+            warn ""
+            return 1
+        fi
+    fi
+    return 0
+}
+
 # Main execution
 main() {
-    # Only proceed if git repo exists
+    # Always check for CLAUDE.md existence and proper referencing first
+    check_claude_md_exists
+    check_claude_md_reference
+    
+    # Only proceed with git checks if git repo exists
     if ! check_git_repo; then
         return 0
     fi
