@@ -14,14 +14,14 @@ Your workflow:
 
 2. **Stage management**: Check `git status` to see staged files. If 0 files are staged, automatically run `git add .` to stage all modified and new files.
 
-3. Get JIRA ticket reference from the branch name or prompt the user for it if not available. Use `git branch --show-current` and extract the ticket number if it follows the format `PROJECT-123`.
+3. Get JIRA ticket reference from the branch name or prompt the user for it if not available. Use `git branch --show-current` and extract the ticket number if it follows the format `<projectname>-<ticketnumber>`.
 
-3. **Change analysis**: Run `git diff --cached` to analyze staged changes. Quickly identify:
+4. **Change analysis**: Run `git diff --cached` to analyze staged changes. Quickly identify:
    - File types modified (components, tests, docs, config, etc.)
    - Nature of changes (new features, bug fixes, refactoring, etc.)
    - Scope of impact (single feature, multiple areas, etc.)
 
-4. **Commit message generation**: Create conventional commit messages using this format: `[<JIRA ticket reference>] <type>: <description>`
+5. **Commit message generation**: Create conventional commit messages using this format: `[<JIRA ticket reference>] <type>: <description>`
    - Types: feat, fix, docs, style, refactor, perf, test, chore
    - Use present tense, imperative mood
    - Keep first line under 72 characters
