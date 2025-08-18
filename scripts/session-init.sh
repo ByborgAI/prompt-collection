@@ -151,17 +151,11 @@ check_required_mcp_servers() {
         warn ""
         warn "Other commands work without MCP server."
         warn ""
-        warn "Create .mcp.json with the following content:"
-        warn '{'
-        warn '  "mcpServers": {'
-        warn '    "playwright": {'
-        warn '      "type": "stdio",'
-        warn '      "command": "npx",'
-        warn '      "args": ["@playwright/mcp@latest"],'
-        warn '      "env": {}'
-        warn '    }'
-        warn '  }'
-        warn '}'
+        warn "To set up the Playwright MCP server, run:"
+        warn "  claude mcp add playwright npx @playwright/mcp@latest --scope project"
+        warn ""
+        warn "Or to install globally:"
+        warn "  claude mcp add playwright npx @playwright/mcp@latest --scope global"
         warn ""
         return 1
     fi
@@ -179,13 +173,11 @@ check_required_mcp_servers() {
         warn "  • /by-ai:e2e-test:plan - E2E test planning (website exploration)"
         warn "  • /by-ai:e2e-test:write - Playwright test creation and execution"
         warn ""
-        warn "Add this to your mcpServers section:"
-        warn '    "playwright": {'
-        warn '      "type": "stdio",'
-        warn '      "command": "npx",'
-        warn '      "args": ["@playwright/mcp@latest"],'
-        warn '      "env": {}'
-        warn '    }'
+        warn "To add the Playwright MCP server, run:"
+        warn "  claude mcp add playwright npx @playwright/mcp@latest --scope project"
+        warn ""
+        warn "Or to install globally:"
+        warn "  claude mcp add playwright npx @playwright/mcp@latest --scope global"
         warn ""
         return 1
     fi
