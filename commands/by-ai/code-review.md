@@ -10,13 +10,8 @@ description: "Analyze code quality, security, performance, and architecture"
 Execute comprehensive code analysis across quality, security, performance, and architecture domains.
 
 ## Usage
-<<<<<<< Updated upstream
-```
-/by-ai:code-review [branch]
-=======
 ```bash
-/by-ai:code-review [branch] [--focus quality|security|performance|architecture] [--depth quick|deep]
->>>>>>> Stashed changes
+/by-ai:code-review [branch]
 ```
 
 ## Execution
