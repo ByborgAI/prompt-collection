@@ -1,5 +1,5 @@
 ---
-allowed-tools: [Read, Grep, Glob, Bash, TodoWrite]
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite
 description: "Write unit and integration tests for new code"
 ---
 
@@ -11,7 +11,7 @@ Generate unit and integration tests for newly added code to ensure functionality
 
 ## Usage
 
-```
+```bash
 /by-ai:write-unit-tests
 ```
 

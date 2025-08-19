@@ -1,5 +1,5 @@
 ---
-allowed-tools: [Read, Grep, Glob, Bash, TodoWrite]
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite
 description: "Creator commit message for current changes"
 ---
 
@@ -11,13 +11,13 @@ This command helps you create well-formatted commits with conventional commit me
 
 ## Usage
 
-```
+```bash
 /by-ai:commit
 ```
 
 Or with options:
 
-```
+```bash
 /by-ai:commit --no-verify
 ```
 
