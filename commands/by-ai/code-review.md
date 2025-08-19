@@ -11,14 +11,8 @@ Execute comprehensive code analysis across quality, security, performance, and a
 
 ## Usage
 ```
-/by-ai:code-review [branch] [--focus quality|security|performance|architecture] [--depth quick|deep]
+/by-ai:code-review [branch]
 ```
-
-## Arguments
-- `branch` - Target branch to compare against current branch (defaults to 'master')
-- `--focus` - Analysis focus area (quality, security, performance, architecture)
-- `--depth` - Analysis depth (quick, deep)
-- `--format` - Output format (text, json, report)
 
 ## Execution
 1. Discover and categorize files for analysis based on the diff between the current branch and the target branch:
