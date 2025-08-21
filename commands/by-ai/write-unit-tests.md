@@ -1,18 +1,24 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash, TodoWrite
-description: "Write unit and integration tests for new code"
+description: "Write unit and integration tests for new or existing code"
 ---
 
 # /by-ai:write-unit-tests - Write unit and integration tests
 
 ## Purpose
 
-Generate unit and integration tests for newly added code to ensure functionality and reliability.
+Generate unit and integration tests for newly added code or specified existing file to ensure functionality and reliability.
 
 ## Usage
 
 ```bash
 /by-ai:write-unit-tests
+```
+
+Or for exisiting file:
+
+```bash
+/by-ai:write-unit-tests [file_to_test]
 ```
 
 ## Execution
@@ -26,11 +32,12 @@ Generate unit and integration tests for newly added code to ensure functionality
 
 2. **Code Analysis for Testing**
 
-   - Identify the newly added code by comparing the current branch with the development branch
+   - If `[file_to_test]` is provided, analyze the specified file for testing.
+   - If `[file_to_test]` is NOT provided, identify the newly added code by comparing the current branch with the development branch
      - Checks which files are staged with `git status`
      - If 0 files are staged, automatically adds all modified and new files with `git add`
      - Use `git diff` to analyze changes, compare to master/main or branch name given from arguments: **$ARGUMENTS**
-   - Analyze the new code that needs testing, ONLY create tests for newly added code
+   - Analyze the code that needs testing, ONLY create tests for newly added code or `[file_to_test]` if provided.
    - Identify public interfaces and critical business logic
    - Map out dependencies and external interactions
    - Understand error conditions and edge cases
@@ -103,7 +110,7 @@ Generate unit and integration tests for newly added code to ensure functionality
 
 - The output is a set of unit and integration tests formatted for the appropriate testing framework.
 - Include comments where necessary to explain complex logic or edge cases.
-- Make sure every newly added function or component has corresponding tests.
+- Make sure every function or component has corresponding tests.
 - DO NOT modify, update, or refactor any implementation (non-test) code under any circumstances.
 - If a test is failing due to a mismatch with the implementation, update ONLY the test code to accurately reflect the current implementation, unless explicitly instructed otherwise.
 - If you believe the implementation is incorrect, DO NOT change it; instead, leave a comment in the test file describing the suspected issue for human review.
