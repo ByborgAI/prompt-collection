@@ -99,7 +99,7 @@ Commands are located in the `commands/by-ai/` directory and provide structured p
 
 - **[code-review.md](commands/by-ai/code-review.md)**: Comprehensive code review guidelines
 - **[write-unit-tests.md](commands/by-ai/write-unit-tests.md)**: Unit test generation and best practices
-- **[commit.md](commands/by-ai/commit.md)**: Automated commit message generation and validation
+- **[commit-suggest.md](commands/by-ai/commit-suggest.md)**: Automated commit message generation and validation
 - **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production with Playwright MCP using chrome
 
 ### E2E Testing Workflow
