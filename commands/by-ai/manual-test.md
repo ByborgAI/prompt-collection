@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash, TodoWrite, WebFetch, WebSearch
-description: "Analyzes merged commit changes from input and manual tests the related features on production with Playwright MCP"
+description: "Analyzes merged commit changes from input and manual tests the related features on production with Playwright MCP using chrome"
 ---
 
 # /by-ai:manual-test - Manual test change in production
 
 ## Purpose
 
-This command allows you to manually test changes in production by reading merged commit changes and testing the related features on production using Playwright MCP.
+This command allows you to manually test changes in production with a chrome browser by reading merged commit changes and testing the related features on production using Playwright MCP.
 
 ## Usage
 
@@ -15,7 +15,7 @@ This command allows you to manually test changes in production by reading merged
 /by-ai:manual-test [production_url] [commit_hash]
 ```
 
-Or with options:
+Or --no-verify to skip the manual test plan confirmation step:
 
 ```bash
 /by-ai:manual-test [production_url] [commit_hash] --no-verify

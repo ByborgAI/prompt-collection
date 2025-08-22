@@ -11,6 +11,8 @@ Generate unit and integration tests for newly added code or specified existing f
 
 ## Usage
 
+For newly added code:
+
 ```bash
 /by-ai:write-unit-tests
 ```

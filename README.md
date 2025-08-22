@@ -16,14 +16,25 @@ This repository provides a structured framework for AI-driven development using 
 ### Installation
 
 1. **Clone or add as submodule** to your project's `.claude` directory:
+
    ```bash
    git submodule add git@github.com:ByborgCopilot/byborgai-prompt-collection.git .claude
    ```
 
-2. **GitHub Integration** (Optional): Follow [GITHUB.md](GITHUB.md) for Claude's native GitHub app setup
+   Init `CLAUDE.md` for the repository:
 
-3. **Playwright MCP Setup** for browser interactions and testing: install by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
-      
+   ```bash
+   claude "/init"
+   ```
+
+   Reference `@.claude/CLAUDE.md` in projects `CLAUDE.md` understand the core principles and rules:
+
+   ```bash
+   echo '\n@.claude/CLAUDE.md' >> CLAUDE.md
+   ```
+
+2. **Playwright MCP Setup** for browser interactions and testing: install by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
+
    ```bash
    # Add Playwright MCP to your project mcp config
    claude mcp add playwright npx @playwright/mcp@latest --scope project
@@ -32,6 +43,8 @@ This repository provides a structured framework for AI-driven development using 
    ```
 
    Add `.playwright-mcp` to your `.gitignore` file to avoid committing the Playwright MCP testing screenshots and videos.
+
+3. **GitHub Integration** (Optional): Follow [GITHUB.md](GITHUB.md) for Claude's native GitHub app setup
 
 4. **Atlassian MCP Setup** (Optional): integrate with Atlassian products like Jira and Confluence by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
 
@@ -43,6 +56,7 @@ This repository provides a structured framework for AI-driven development using 
    ```
 
    This will allow you to use the Atlassian MCP for tasks like reading Jira issues or Confluence pages. Example usage:
+
    ```bash
    claude "Fix the issue described here: [link-to-jira-issue]"
    ```
@@ -61,12 +75,14 @@ This repository provides a structured framework for AI-driven development using 
 Commands are located in the `commands/by-ai/` directory and provide structured prompts for common development tasks:
 
 ### Code Quality & Testing
+
 - **[code-review.md](commands/by-ai/code-review.md)**: Comprehensive code review guidelines
 - **[write-unit-tests.md](commands/by-ai/write-unit-tests.md)**: Unit test generation and best practices
 - **[commit.md](commands/by-ai/commit.md)**: Automated commit message generation and validation
-- **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production
+- **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production with Playwright MCP using chrome
 
 ### E2E Testing Workflow
+
 - **[e2e-test/plan.md](commands/by-ai/e2e-test/plan.md)**: End-to-end test planning strategies
 - **[e2e-test/write.md](commands/by-ai/e2e-test/write.md)**: E2E test implementation guidelines
 
@@ -75,22 +91,28 @@ Commands are located in the `commands/by-ai/` directory and provide structured p
 Specialized agents in the `agents/` directory provide focused assistance for specific domains:
 
 ### Testing Specialists
+
 - **[e2e-test-planner.md](agents/e2e-test-planner.md)**: Strategic E2E test planning and architecture
 - **[e2e-test-writer.md](agents/e2e-test-writer.md)**: E2E test implementation and execution
 - **[e2e-test-qa.md](agents/e2e-test-qa.md)**: Quality assurance and test validation
 
 ### Development Automation
+
 - **[auto-committer.md](agents/auto-committer.md)**: Automated commit generation with conventional commit standards
 
 ## Configuration
 
 ### Settings
+
 The repository includes Claude Code configuration files:
+
 - `settings.json`: Primary configuration with hooks and permissions
 - `settings.local.json`: Local overrides (git-ignored)
 
 ### Session Initialization
+
 The `scripts/session-init.sh` automatically runs on session start to:
+
 - Check for configuration updates
 - Notify about available submodule updates
 - Provide update instructions
@@ -98,19 +120,25 @@ The `scripts/session-init.sh` automatically runs on session start to:
 ## Usage Patterns
 
 ### Basic Command Usage
+
 Use commands by referencing them in your prompts:
+
 ```bash
 claude "@commands/by-ai/code-review.md"
 ```
 
 ### Agent Invocation
+
 Spawn specialized agents for focused tasks:
+
 ```bash
 claude "/spawn @agents/e2e-test-planner.md"
 ```
 
 ### GitHub Integration
+
 With the GitHub app installed, mention `@claude` in PRs and issues:
+
 ```markdown
 @claude Please review this PR using the code review guidelines
 @claude Generate unit tests for the new authentication module
@@ -129,6 +157,7 @@ With the GitHub app installed, mention `@claude` in PRs and issues:
 This repository includes an automated pre-commit hook that runs code reviews before commits:
 
 1. **Install the pre-commit hook**:
+
    ```bash
    ./scripts/install-pre-commit-hook.sh
    ```

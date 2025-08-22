@@ -28,7 +28,11 @@ claude "/install-github-app"
 
 ### Performance
 
-To optimizing performance add create a `CLAUDE.md` file in your repository root to define **code style guidelines, review criteria, project-specific rules, and preferred patterns**.
+To optimizing performance create a `CLAUDE.md` file in your repository root. Make sure to define **code style guidelines, review criteria, project-specific rules, and preferred patterns**. You can initialize it claude CLI:
+
+```bash
+claude "/init"
+```
 
 ### Usage
 
