@@ -15,23 +15,44 @@ This repository provides a structured framework for AI-driven development using 
 
 ### Installation
 
-1. **Clone or add as submodule** to your project's `.claude` directory:
+0. **Prerequisites**:
 
-   ```bash
-   git submodule add git@github.com:ByborgCopilot/byborgai-prompt-collection.git .claude
-   ```
+   - Request Byborg Enterprises Anthropic access if you don't have it yet
+   - Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code/setup) (create API key [here](https://console.anthropic.com/settings/keys))
 
-   Init `CLAUDE.md` for the repository:
+1. **Setup ByborgAI Prompt Collection**:
 
-   ```bash
-   claude "/init"
-   ```
+   - Add as submodule to your project's `.claude` directory:
 
-   Reference `@.claude/CLAUDE.md` in projects `CLAUDE.md` understand the core principles and rules:
+     ```bash
+     git submodule add git@github.com:ByborgCopilot/byborgai-prompt-collection.git .claude
+     ```
 
-   ```bash
-   echo '\n@.claude/CLAUDE.md' >> CLAUDE.md
-   ```
+     OR add it to your home directory for global access:
+
+     ```bash
+     git clone git@github.com:ByborgCopilot/byborgai-prompt-collection.git ~/.claude
+     ```
+
+   - Init `CLAUDE.md` in your repository:
+
+     ```bash
+     claude "/init"
+     ```
+
+   - Reference ByborgAI Prompt Collection `CLAUDE.md` in projects `CLAUDE.md` understand the core principles and rules:
+
+     For Submodule installation:
+
+     ```bash
+     echo '\n@.claude/CLAUDE.md' >> CLAUDE.md
+     ```
+
+     For Global installation:
+
+     ```bash
+     echo '\n@~/.claude/CLAUDE.md' >> CLAUDE.md
+     ```
 
 2. **Playwright MCP Setup** for browser interactions and testing: install by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
 
