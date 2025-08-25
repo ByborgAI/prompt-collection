@@ -1,6 +1,7 @@
 ---
 allowed-tools: Read, Grep, Glob, Bash, TodoWrite, Bash(git add .), Bash(scripts/find-ticket-from-branch.sh)
-description: "This command suggests a commit message for current changes without executing the commit"
+argument-hint: "[--breaking] [--type <type>] [--ticket <ticket>]"
+description: "This command suggests a commit message for current changes without executing the commit and copies the commit command to clipboard"
 ---
 
 # /by-ai:commit-suggest - Suggests a commit message for current changes
@@ -29,9 +30,16 @@ Force commit type with:
 
 Where `<type>` is one of: feat, fix, docs, style, refactor, perf, test, chore
 
+Force ticket ID with:
+
+```bash
+/by-ai:commit-suggest --ticket <ticket>
+```
+
 ## What This Command Does
 
 1. Runs `.claude/scripts/find-ticket-from-branch.sh` script to extract a related ticket ID from the current branch name and include it in the commit message if found
+   - If a `--ticket <ticket>` argument is provided, it MUST use that ticket ID instead of extracting from branch name
    - If no ticket ID is found you MUST prompt the user and wait to provide one before proceeding any steps further
 2. Checks staged files with `git status`
    - If no files are staged, automatically adds all modified/new files with `git add .`

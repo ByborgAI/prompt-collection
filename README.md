@@ -99,7 +99,8 @@ Commands are located in the `commands/by-ai/` directory and provide structured p
 
 - **[code-review.md](commands/by-ai/code-review.md)**: Comprehensive code review guidelines
 - **[write-unit-tests.md](commands/by-ai/write-unit-tests.md)**: Unit test generation and best practices
-- **[commit-suggest.md](commands/by-ai/commit-suggest.md)**: Automated commit message generation and validation
+- **[summarize-changes.md](commands/by-ai/summarize-changes.md)**: Summarizes current changes using git diff in a commit message style
+- **[commit-suggest.md](commands/by-ai/commit-suggest.md)**: Suggests a git commit command for current changes without executing the commit and copies the commit command to clipboard
 - **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production with Playwright MCP using chrome
 
 ### E2E Testing Workflow
@@ -120,6 +121,10 @@ Specialized agents in the `agents/` directory provide focused assistance for spe
 ### Development Automation
 
 - **[auto-committer.md](agents/auto-committer.md)**: Automated commit generation with conventional commit standards
+
+## Available Scripts
+
+- **[commit.sh](scripts/commit.sh)**: Automated commiter script with AI-generated messages. `./.claude/scripts/commit.sh -h` for usage details
 
 ## Configuration
 
