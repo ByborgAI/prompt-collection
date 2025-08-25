@@ -15,10 +15,24 @@ This command suggests a well-formatted commit message with conventional commit m
 /by-ai:commit-suggest
 ```
 
+Force breaking change structure with:
+
+```bash
+/by-ai:commit-suggest --breaking
+```
+
+Force commit type with:
+
+```bash
+/by-ai:commit-suggest --type <type>
+```
+
+Where `<type>` is one of: feat, fix, docs, style, refactor, perf, test, chore
+
 ## What This Command Does
 
 1. Runs `.claude/scripts/find-ticket-from-branch.sh` script to extract a related ticket ID from the current branch name and include it in the commit message if found
-   - If no ticket ID is found you MUST prompt the user to provide one
+   - If no ticket ID is found you MUST prompt the user and wait to provide one before proceeding any steps further
 2. Checks staged files with `git status`
    - If no files are staged, automatically adds all modified/new files with `git add .`
 3. Analyzes the changes with `git diff --cached` to understand what is being committed. Quickly identify:
@@ -26,10 +40,23 @@ This command suggests a well-formatted commit message with conventional commit m
    - Nature of changes (new features, bug fixes, refactoring, etc.)
    - Scope of impact (single feature, multiple areas, etc.)
 4. Suggests a conventional commit message that accurately reflects the changes being committed `[<JIRA ticket reference>] <type>: <description>`
+
    - Types: feat, fix, docs, style, refactor, perf, test, chore
    - Use present tense, imperative mood
    - Keep first line under 72 characters
    - Be specific but concise
+   - Use multiple lines if necessary
+   - Single-line example: `[PROJ-123] fix: resolve memory leak in rendering process`
+   - Multi-line example:
+
+     ```
+     [PROJ-123] feat: add user authentication module
+
+     - Implement login and registration endpoints
+     - Add JWT-based authentication
+     - Update user model with password hashing
+     ```
+
 5. Outputs the suggested git commit command with the message: `git commit -m "<suggested message>"`
 6. Copies the suggested git commit command to clipboard with `pbcopy`
 
