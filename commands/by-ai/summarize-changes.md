@@ -7,7 +7,7 @@ description: "This command quickly summarizes current changes using git diff"
 
 ## Purpose
 
-This command analyzes the current changes in the git repository using `git diff` and provides a concise and short summary of the modifications, additions, and deletions. It helps developers quickly understand the scope and impact of their changes before committing.
+This command analyzes the current changes in the git repository using `git diff HEAD` and provides a concise and short summary of the modifications, additions, and deletions. It helps developers quickly understand the scope and impact of their changes before committing.
 
 ## Usage
 
@@ -17,7 +17,7 @@ This command analyzes the current changes in the git repository using `git diff`
 
 ## What This Command Does
 
-1. Analyzes the changes with `git diff` to understand what is being changed. Quickly identify:
+1. Analyzes the changes with `git diff HEAD` to understand what is being changed. Quickly identify:
    - File types modified (components, tests, docs, config, etc.)
    - Nature of changes (new features, bug fixes, refactoring, breaking changes etc.)
    - Scope of impact (single feature, multiple areas, etc.)
