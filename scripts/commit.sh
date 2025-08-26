@@ -12,12 +12,13 @@
 #   - If `--breaking` flag is provided, append "BREAKING CHANGE:" to the commit message
 # 5. Execute the git commit with the finalized message
 
-# Usage: ./scripts/commit.sh [--breaking] [--type <type>] [--ticket <ticket>]
+# Usage: ./scripts/commit.sh [--breaking] [--type <type>] [--ticket <ticket>] [-s|--short]
 
 # Options:
 #   --breaking          Mark the commit as a breaking change
 #   --type <type>       Specify the commit type (feat, fix, docs, style, refactor, perf, test, chore)
 #   --ticket <ticket>   Specify the ticket number manually
+#   -s, --short         Generate a short summary instead of detailed bullet points
 #   -h, --help          Show this help message and exit
 
 set -e
@@ -26,12 +27,13 @@ set -e
 BREAKING=false
 TYPE=""
 TICKET=""
+SHORT=false
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Function to show help
 show_help() {
-    echo "Usage: $0 [--breaking] [--type <type>] [--ticket <ticket>] [-h|--help]"
+    echo "Usage: $0 [--breaking] [--type <type>] [--ticket <ticket>] [-s|--short] [-h|--help]"
     echo ""
     echo "Create a git commit with AI-generated summary and structured format"
     echo ""
@@ -39,6 +41,7 @@ show_help() {
     echo "  --breaking          Mark the commit as a breaking change"
     echo "  --type <type>       Specify the commit type (feat, fix, docs, style, refactor, perf, test, chore)"
     echo "  --ticket <ticket>   Specify the ticket number manually"
+    echo "  -s, --short         Generate a short summary instead of detailed bullet points"
     echo "  -h, --help          Show this help message and exit"
     echo ""
     echo "Commit types:"
@@ -66,6 +69,10 @@ while [[ $# -gt 0 ]]; do
         --ticket)
             TICKET="$2"
             shift 2
+            ;;
+        -s|--short)
+            SHORT=true
+            shift
             ;;
         -h|--help)
             show_help
@@ -99,7 +106,11 @@ SUMMARY_FILE=$(mktemp)
 trap "rm -f $SUMMARY_FILE" EXIT
 
 # Start AI summary generation in background
-claude "/by-ai:summarize-changes" -p > "$SUMMARY_FILE" 2>&1 &
+if [[ "$SHORT" == "true" ]]; then
+    claude "/by-ai:summarize-changes --short" -p > "$SUMMARY_FILE" 2>&1 &
+else
+    claude "/by-ai:summarize-changes" -p > "$SUMMARY_FILE" 2>&1 &
+fi
 AI_SUMMARY_PID=$!
 
 echo "✅ AI summary generation started (PID: $AI_SUMMARY_PID)"
@@ -246,14 +257,19 @@ cat "$COMMIT_MSG_FILE"
 echo "----------------------------------------"
 echo ""
 
-# Allow user to edit the commit message
+# Ask user to confirm or edit the commit message
 while true; do
-    read -p "Edit commit message? [y/N]: " edit_choice
-    edit_choice=$(echo "$edit_choice" | tr '[:upper:]' '[:lower:]' | xargs)
+    read -p "Proceed with this commit? [Y/n]: " confirm_choice
+    confirm_choice=$(echo "$confirm_choice" | tr '[:upper:]' '[:lower:]' | xargs)
     
-    case $edit_choice in
-        y|yes)
-            # Use the user's preferred editor or fall back to nano
+    case $confirm_choice in
+        y|yes|"")
+            # User confirmed, proceed with commit
+            FINAL_MESSAGE=$(cat "$COMMIT_MSG_FILE")
+            break
+            ;;
+        n|no)
+            # User wants to edit, open editor
             EDITOR=${EDITOR:-nano}
             if ! "$EDITOR" "$COMMIT_MSG_FILE"; then
                 echo "Error: Failed to open editor" >&2
@@ -266,17 +282,13 @@ while true; do
             cat "$COMMIT_MSG_FILE"
             echo "----------------------------------------"
             echo ""
-            ;;
-        n|no|"")
-            break
+            # Loop back to confirmation
             ;;
         *)
             echo "Please enter y/yes or n/no"
             ;;
     esac
 done
-
-FINAL_MESSAGE=$(cat "$COMMIT_MSG_FILE")
 
 # Validate the final message is not empty
 if [[ -z "$(echo "$FINAL_MESSAGE" | xargs)" ]]; then

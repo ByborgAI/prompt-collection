@@ -15,6 +15,12 @@ This command analyzes the current changes in the git repository using `git diff 
 /by-ai:summarize-changes
 ```
 
+For a shorter summary, use:
+
+```bash
+/by-ai:summarize-changes --short
+```
+
 ## What This Command Does
 
 1. Analyzes the changes with `git diff HEAD` to understand what is being changed. Quickly identify:
@@ -22,9 +28,9 @@ This command analyzes the current changes in the git repository using `git diff 
    - Nature of changes (new features, bug fixes, refactoring, breaking changes etc.)
    - Scope of impact (single feature, multiple areas, etc.)
 2. Outputs a structured summary of the changes in a commit message style:
-   - The first line MUST be a title of the overall changes (under 72 characters). An empty line follows.
-   - Use bullet points to organize the changes in a list format under the title (max 5 bullet points).
-   - Maximum line length is 100 characters.
+   - The first line MUST be a title of the overall changes.
+   - If `--short` is not specified, use bullet points to organize the changes in a list format under the title and an empty line (max 5 bullet points).
+   - Maximum line length is 72 characters for each line in the summary.
    - Use present tense, imperative mood.
    - Be specific but concise.
    - Prioritize speed - make quick, accurate assessments
@@ -37,11 +43,12 @@ This command analyzes the current changes in the git repository using `git diff 
 
 Example Changes Summary Output:
 
-````
+```
 Add user authentication module
 
 - Implement login and registration endpoints
 - Add JWT-based authentication
 - Update user model with password hashing
 ```
-````
+
+Example Short Changes Summary Output: "Add user authentication module with login, registration and JWT-based auth"
