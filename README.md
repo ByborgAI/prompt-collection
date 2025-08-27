@@ -93,6 +93,8 @@ This repository provides a structured framework for AI-driven development using 
 
 ## Available Commands
 
+For comprehensive command documentation, see **[COMMANDS.md](COMMANDS.md)**.
+
 Commands are located in the `commands/by-ai/` directory and provide structured prompts for common development tasks:
 
 ### Code Quality & Testing
@@ -123,6 +125,8 @@ Specialized agents in the `agents/` directory provide focused assistance for spe
 - **[auto-committer.md](agents/auto-committer.md)**: Automated commit generation with conventional commit standards
 
 ## Available Scripts
+
+For detailed script documentation, see the **[Utility Scripts section in COMMANDS.md](COMMANDS.md#-utility-scripts)**.
 
 - **[commit.sh](scripts/commit.sh)**: Automated commiter script with AI-generated messages. `./.claude/scripts/commit.sh -h` for usage details
 
