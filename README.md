@@ -13,7 +13,7 @@ This repository provides a structured framework for AI-driven development using 
 
 ## Quick Start
 
-### Installation
+### Installation and usefull MCP setups
 
 0. **Prerequisites**:
 
@@ -90,6 +90,22 @@ This repository provides a structured framework for AI-driven development using 
 - **[RULES.md](RULES.md)**: Actionable operational rules for task management and execution
 - **[PRINCIPLES.md](PRINCIPLES.md)**: Core development philosophy and decision-making frameworks
 - **[GITHUB.md](GITHUB.md)**: GitHub integration setup instructions
+
+5. **Sentry MCP Setup** (Optional): integrate with Sentry by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
+
+   ```bash
+   # Add Sentry MCP to your project mcp config
+   claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+   # Connect Sentry MCP
+   claude "/mcp"
+   ```
+
+   This will allow you to use the Sentry MCP for tasks like reading and fixing Sentry issues. Example usage:
+
+   ```bash
+   claude "Fix the issue described here: [link-to-sentry-issue]"
+   claude "Find the most frequent Sentry issue and fix it in project [project-name]"
+   ```
 
 ## Available Commands
 
