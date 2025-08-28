@@ -18,7 +18,7 @@ This repository provides a structured framework for AI-driven development using 
 0. **Prerequisites**:
 
    - Request Byborg Enterprises Anthropic access if you don't have it yet
-   - Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code/setup) (create API key [here](https://console.anthropic.com/settings/keys))
+   - Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code/setup) ([create API key here](https://console.anthropic.com/settings/keys))
 
 1. **Setup ByborgAI Prompt Collection**:
 
@@ -67,7 +67,11 @@ This repository provides a structured framework for AI-driven development using 
 
 3. **GitHub Integration** (Optional): Follow [GITHUB.md](GITHUB.md) for Claude's native GitHub app setup
 
-4. **Atlassian MCP Setup** (Optional): integrate with Atlassian products like Jira and Confluence by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
+4. **Atlassian MCP Setup** (Optional): integrate with Atlassian products like Jira and Confluence
+
+   **Hosted Atlassian**: follow instructions in **[doclerholding atlassian-mcp-server repo](https://stash.doclerholding.com/projects/AITT/repos/atlassian-mcp-server/browse)**.
+
+   **Cloud Atlassian**: run the following commands in your terminal to install offical Atlassian MCP (you can leave out `--scope project` if you want to install it globally):
 
    ```bash
    # Add Atlassian MCP to your project mcp config
@@ -84,13 +88,6 @@ This repository provides a structured framework for AI-driven development using 
 
    You can also ask Claude to create, update, comment, or bulk edit Jira issues or Confluence pages using the Atlassian MCP.
 
-### Core Framework Files
-
-- **[CLAUDE.md](CLAUDE.md)**: Entry point referencing core rules and principles
-- **[RULES.md](RULES.md)**: Actionable operational rules for task management and execution
-- **[PRINCIPLES.md](PRINCIPLES.md)**: Core development philosophy and decision-making frameworks
-- **[GITHUB.md](GITHUB.md)**: GitHub integration setup instructions
-
 5. **Sentry MCP Setup** (Optional): integrate with Sentry by running the following commands in your terminal (you can leave out `--scope project` if you want to install it globally):
 
    ```bash
@@ -106,6 +103,13 @@ This repository provides a structured framework for AI-driven development using 
    claude "Fix the issue described here: [link-to-sentry-issue]"
    claude "Find the most frequent Sentry issue and fix it in project [project-name]"
    ```
+
+### Core Framework Files
+
+- **[CLAUDE.md](CLAUDE.md)**: Entry point referencing core rules and principles
+- **[RULES.md](RULES.md)**: Actionable operational rules for task management and execution
+- **[PRINCIPLES.md](PRINCIPLES.md)**: Core development philosophy and decision-making frameworks
+- **[GITHUB.md](GITHUB.md)**: GitHub integration setup instructions
 
 ## Available Commands
 
