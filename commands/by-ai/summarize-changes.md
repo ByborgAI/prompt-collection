@@ -43,7 +43,7 @@ For a shorter summary, use:
 
 Example Changes Summary Output:
 
-```
+```text
 Add user authentication module
 
 - Implement login and registration endpoints

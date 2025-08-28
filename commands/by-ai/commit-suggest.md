@@ -57,7 +57,7 @@ Force ticket ID with:
    - Single-line example: `[PROJ-123] fix: resolve memory leak in rendering process`
    - Multi-line example:
 
-     ```
+     ```text
      [PROJ-123] feat: add user authentication module
 
      - Implement login and registration endpoints

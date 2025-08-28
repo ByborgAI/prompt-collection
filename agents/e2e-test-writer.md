@@ -75,7 +75,7 @@ When invoked, you must follow these steps:
 - Conduct peer reviews of test cases
 - Monitor test runs and maintain test stability
 
-### TESTING ANTI-PATTERNS TO AVOID:
+### TESTING ANTI-PATTERNS TO AVOID
 
 1. **No Conditional Skipping**: Never use patterns like:
 
@@ -87,15 +87,15 @@ When invoked, you must follow these steps:
 
 2. Always Assert Expected Elements: If a test is checking for specific functionality, that functionality MUST exist. Use:
 
-```javascript
-// Good - fails if button doesn't exist
-await expect(muteButton).toBeVisible();
+   ```javascript
+   // Good - fails if button doesn't exist
+   await expect(muteButton).toBeVisible();
 
-// Bad - passes if button doesn't exist
-if ((await muteButton.count()) > 0) {
-  await expect(muteButton).toBeVisible();
-}
-```
+   // Bad - passes if button doesn't exist
+   if ((await muteButton.count()) > 0) {
+     await expect(muteButton).toBeVisible();
+   }
+   ```
 
 3. Use Proper Test Structure:
 

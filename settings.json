@@ -27,7 +27,6 @@
     "allow": [
       "Write(**)",
       "Read(**)",
-      "WebFetch(domain:cherry.tv)",
       "Bash(find:*)",
       "mcp__playwright__browser_close",
       "mcp__playwright__browser_resize",

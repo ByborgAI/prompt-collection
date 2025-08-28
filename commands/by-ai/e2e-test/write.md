@@ -1,4 +1,4 @@
-## Usage
+# Usage
 
 ```bash
 /by-ai:e2e-test:write

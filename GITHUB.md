@@ -1,10 +1,10 @@
 # Claude's Native GitHub App Setup Instructions
 
-https://docs.anthropic.com/en/docs/claude-code/github-actions
+<https://docs.anthropic.com/en/docs/claude-code/github-actions>
 
 ## Quick setup
 
-### Install GitHub CLI and authenticate:
+### Install GitHub CLI and authenticate
 
 ```bash
 # Install GitHub CLI
@@ -13,7 +13,7 @@ brew install gh
 gh auth login
 ```
 
-### Run claude CLI and install the GitHub app:
+### Run claude CLI and install the GitHub app
 
 ```bash
 claude "/install-github-app"
