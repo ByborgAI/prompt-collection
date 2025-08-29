@@ -104,6 +104,10 @@ This repository provides a structured framework for AI-driven development using 
    claude "Find the most frequent Sentry issue and fix it in project [project-name]"
    ```
 
+6. **Integrate Other MCPs** as needed for your workflow (DB exploration, Figma integration, Payment APIs, etc.): Explore available MCPs at the [Model Context Protocol servers](https://github.com/modelcontextprotocol/servers).
+
+7. **Build Your Own MCP** (Optional): To implement custom MCPs for your specific tools or services, refer to [modelcontextprotocol sdks with the selected language](https://modelcontextprotocol.io/docs/sdk#available-sdks).
+
 ### Core Framework Files
 
 - **[CLAUDE.md](CLAUDE.md)**: Entry point referencing core rules and principles
