@@ -25,13 +25,13 @@ This repository provides a structured framework for AI-driven development using 
    - Add as submodule to your project's `.claude` directory:
 
      ```bash
-     git submodule add git@github.com:ByborgCopilot/byborgai-prompt-collection.git .claude
+     git submodule add git@github.com:ByborgAI/prompt-collection.git .claude
      ```
 
      OR add it to your home directory for global access:
 
      ```bash
-     git clone git@github.com:ByborgCopilot/byborgai-prompt-collection.git ~/.claude
+     git clone git@github.com:ByborgAI/prompt-collection.git ~/.claude
      ```
 
    - Init `CLAUDE.md` in your repository:
