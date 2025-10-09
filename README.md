@@ -22,13 +22,7 @@ This repository provides a structured framework for AI-driven development using 
 
 1. **Setup ByborgAI Prompt Collection**:
 
-   - Add as submodule to your project's `.claude` directory:
-
-     ```bash
-     git submodule add git@github.com:ByborgAI/prompt-collection.git .claude
-     ```
-
-     OR add it to your home directory for global access:
+   - Add it to your home directory for global access:
 
      ```bash
      git clone git@github.com:ByborgAI/prompt-collection.git ~/.claude
