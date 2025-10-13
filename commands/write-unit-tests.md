@@ -3,7 +3,7 @@ allowed-tools: Read, Grep, Glob, Bash, TodoWrite
 description: "Write unit and integration tests for new or existing code"
 ---
 
-# /aitt:write-unit-tests - Write unit and integration tests
+# /write-unit-tests - Write unit and integration tests
 
 ## Purpose
 
@@ -14,13 +14,13 @@ Generate unit and integration tests for newly added code or specified existing f
 For newly added code:
 
 ```bash
-/aitt:write-unit-tests
+/write-unit-tests
 ```
 
 Or for exisiting file:
 
 ```bash
-/aitt:write-unit-tests [file_to_test]
+/write-unit-tests [file_to_test]
 ```
 
 ## Execution

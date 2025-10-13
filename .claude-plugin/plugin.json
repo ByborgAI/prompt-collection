@@ -1,0 +1,15 @@
+{
+  "name": "prompt-collection",
+  "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management",
+  "version": "1.0.0",
+  "author": {
+    "name": "Byborg"
+  },
+  "keywords": [
+    "testing",
+    "e2e",
+    "code-review",
+    "commit",
+    "automation"
+  ]
+}

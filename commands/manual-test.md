@@ -3,7 +3,7 @@ allowed-tools: Read, Grep, Glob, Bash, TodoWrite, WebFetch, WebSearch
 description: "Analyzes merged commit changes from input and manual tests the related features on production with Playwright MCP using chrome"
 ---
 
-# /aitt:manual-test - Manual test change in production
+# /manual-test - Manual test change in production
 
 ## Purpose
 
@@ -12,13 +12,13 @@ This command allows you to manually test changes in production with a chrome bro
 ## Usage
 
 ```bash
-/aitt:manual-test [production_url] [commit_hash]
+/manual-test [production_url] [commit_hash]
 ```
 
 Or --no-verify to skip the manual test plan confirmation step:
 
 ```bash
-/aitt:manual-test [production_url] [commit_hash] --no-verify
+/manual-test [production_url] [commit_hash] --no-verify
 ```
 
 ## What This Command Does

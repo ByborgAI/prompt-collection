@@ -3,7 +3,7 @@ allowed-tools: Read, Grep, Glob, Bash
 description: "This command quickly summarizes current changes using git diff"
 ---
 
-# /aitt:summarize-changes - Summarizes current changes using git diff
+# /summarize-changes - Summarizes current changes using git diff
 
 ## Purpose
 
@@ -12,13 +12,13 @@ This command analyzes the current changes in the git repository using `git diff 
 ## Usage
 
 ```bash
-/aitt:summarize-changes
+/summarize-changes
 ```
 
 For a shorter summary, use:
 
 ```bash
-/aitt:summarize-changes --short
+/summarize-changes --short
 ```
 
 ## What This Command Does

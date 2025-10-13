@@ -1,7 +1,7 @@
 # Usage
 
 ```bash
-/aitt:e2e-test:plan
+/e2e-test:plan
 ```
 
 ## Execution

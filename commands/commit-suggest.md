@@ -4,7 +4,7 @@ argument-hint: "[--breaking] [--type <type>] [--ticket <ticket>]"
 description: "This command suggests a commit message for current changes without executing the commit and copies the commit command to clipboard"
 ---
 
-# /aitt:commit-suggest - Suggests a commit message for current changes
+# /commit-suggest - Suggests a commit message for current changes
 
 ## Purpose
 
@@ -13,19 +13,19 @@ This command suggests a well-formatted commit message with conventional commit m
 ## Usage
 
 ```bash
-/aitt:commit-suggest
+/commit-suggest
 ```
 
 Force breaking change structure with:
 
 ```bash
-/aitt:commit-suggest --breaking
+/commit-suggest --breaking
 ```
 
 Force commit type with:
 
 ```bash
-/aitt:commit-suggest --type <type>
+/commit-suggest --type <type>
 ```
 
 Where `<type>` is one of: feat, fix, docs, style, refactor, perf, test, chore
@@ -33,7 +33,7 @@ Where `<type>` is one of: feat, fix, docs, style, refactor, perf, test, chore
 Force ticket ID with:
 
 ```bash
-/aitt:commit-suggest --ticket <ticket>
+/commit-suggest --ticket <ticket>
 ```
 
 ## What This Command Does

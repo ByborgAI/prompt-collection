@@ -3,7 +3,7 @@ allowed-tools: Read, Grep, Glob, Bash, TodoWrite
 description: "Analyze code quality, security, performance, and architecture"
 ---
 
-# /aitt:code-review - Code Review
+# /code-review - Code Review
 
 ## Purpose
 
@@ -12,7 +12,7 @@ Execute comprehensive code analysis across quality, security, performance, and a
 ## Usage
 
 ```bash
-/aitt:code-review [branch]
+/code-review [branch]
 ```
 
 ## Execution

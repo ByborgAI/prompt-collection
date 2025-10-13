@@ -1,13 +1,13 @@
 # Usage
 
 ```bash
-/aitt:e2e-test:write
+/e2e-test:write
 ```
 
 Or, to focus on a specific section of the test plan:
 
 ```bash
-/aitt:e2e-test:write [test_plan_section]
+/e2e-test:write [test_plan_section]
 ```
 
 ## Execution
