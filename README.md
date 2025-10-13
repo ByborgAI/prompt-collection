@@ -113,20 +113,20 @@ This repository provides a structured framework for AI-driven development using 
 
 For comprehensive command documentation, see **[COMMANDS.md](COMMANDS.md)**.
 
-Commands are located in the `commands/by-ai/` directory and provide structured prompts for common development tasks:
+Commands are located in the `commands/aitt/` directory and provide structured prompts for common development tasks:
 
 ### Code Quality & Testing
 
-- **[code-review.md](commands/by-ai/code-review.md)**: Comprehensive code review guidelines
-- **[write-unit-tests.md](commands/by-ai/write-unit-tests.md)**: Unit test generation and best practices
-- **[summarize-changes.md](commands/by-ai/summarize-changes.md)**: Summarizes current changes using git diff in a commit message style
-- **[commit-suggest.md](commands/by-ai/commit-suggest.md)**: Suggests a git commit command for current changes without executing the commit and copies the commit command to clipboard
-- **[manual-test.md](commands/by-ai/manual-test.md)**: Manual testing of commit changes in production with Playwright MCP using chrome
+- **[code-review.md](commands/aitt/code-review.md)**: Comprehensive code review guidelines
+- **[write-unit-tests.md](commands/aitt/write-unit-tests.md)**: Unit test generation and best practices
+- **[summarize-changes.md](commands/aitt/summarize-changes.md)**: Summarizes current changes using git diff in a commit message style
+- **[commit-suggest.md](commands/aitt/commit-suggest.md)**: Suggests a git commit command for current changes without executing the commit and copies the commit command to clipboard
+- **[manual-test.md](commands/aitt/manual-test.md)**: Manual testing of commit changes in production with Playwright MCP using chrome
 
 ### E2E Testing Workflow
 
-- **[e2e-test/plan.md](commands/by-ai/e2e-test/plan.md)**: End-to-end test planning strategies
-- **[e2e-test/write.md](commands/by-ai/e2e-test/write.md)**: E2E test implementation guidelines
+- **[e2e-test/plan.md](commands/aitt/e2e-test/plan.md)**: End-to-end test planning strategies
+- **[e2e-test/write.md](commands/aitt/e2e-test/write.md)**: E2E test implementation guidelines
 
 ## Available Agents
 
@@ -172,7 +172,7 @@ The `scripts/session-init.sh` automatically runs on session start to:
 Use commands by referencing them in your prompts:
 
 ```bash
-claude "@commands/by-ai/code-review.md"
+claude "@commands/aitt/code-review.md"
 ```
 
 ### Agent Invocation
@@ -211,7 +211,7 @@ This repository includes an automated pre-commit hook that runs code reviews bef
    ```
 
 2. **What it does**:
-   - Automatically runs `/by-ai:code-review` on staged changes before each commit
+   - Automatically runs `/aitt:code-review` on staged changes before each commit
    - Works with both regular repositories and submodule installations
    - Prompts for confirmation after showing review results
    - Can be bypassed with `git commit --no-verify` if needed

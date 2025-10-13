@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install script for by-ai code review pre-commit hook
-# This script installs the pre-commit hook that runs by-ai code review before commits
+# Install script for aitt code review pre-commit hook
+# This script installs the pre-commit hook that runs aitt code review before commits
 
 set -e
 
@@ -27,7 +27,7 @@ fi
 GIT_HOOKS_DIR="$TARGET_REPO_ROOT/.git/hooks"
 HOOK_TARGET="$GIT_HOOKS_DIR/pre-commit"
 
-echo "🚀 Installing by-ai code review pre-commit hook..."
+echo "🚀 Installing aitt code review pre-commit hook..."
 echo "================================================="
 
 # Check if we're in a git repository (current directory)
@@ -85,12 +85,12 @@ fi
 cat > "$HOOK_TARGET" << EOF
 #!/bin/bash
 
-# Pre-commit hook to run by-ai code review with claude -p before committing
-# This hook runs the by-ai code-review command and prompts user for confirmation
+# Pre-commit hook to run aitt code review with claude -p before committing
+# This hook runs the aitt code-review command and prompts user for confirmation
 
 set -e
 
-echo "🤖 Running claude command /by-ai:code-review before commit..."
+echo "🤖 Running claude command /aitt:code-review before commit..."
 echo "----------------------------------------"
 
 # If this was installed from a submodule, navigate to it first
@@ -100,9 +100,9 @@ if [ -n "\$SUBMODULE_PATH" ]; then
     cd "\$SUBMODULE_PATH"
 fi
 
-# Run the by-ai code review command with claude -p
+# Run the aitt code review command with claude -p
 if claude -p "\\\$(cat <<'REVIEW_EOF'
-/by-ai:code-review $BRANCH_NAME --depth quick --format text
+/aitt:code-review $BRANCH_NAME --depth quick --format text
 REVIEW_EOF
 )"; then
     echo "----------------------------------------"
@@ -152,12 +152,12 @@ echo "📋 What happens now:"
 if [ -n "$SUPERPROJECT_ROOT" ]; then
 echo "   • When you commit from the parent repository ($TARGET_REPO_ROOT), the hook will:"
 echo "     1. Navigate to this submodule ($SUBMODULE_PATH)"
-echo "     2. Run by-ai code review on staged changes"
+echo "     2. Run aitt code review on staged changes"
 echo "     3. Show you the review results"
 echo "     4. Ask if you want to proceed with the commit"
 else
 echo "   • Every time you run 'git commit', the hook will:"
-echo "     1. Run by-ai code review on your staged changes"
+echo "     1. Run aitt code review on your staged changes"
 echo "     2. Show you the review results"
 echo "     3. Ask if you want to proceed with the commit"
 fi

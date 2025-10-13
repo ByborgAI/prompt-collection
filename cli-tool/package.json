@@ -77,12 +77,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhorvathdh/claude-code-templates.git"
+    "url": "git+https://github.com/ByborgAI/prompt-collection.git"
   },
   "bugs": {
-    "url": "https://github.com/dhorvathdh/claude-code-templates/issues"
+    "url": "https://github.com/ByborgAI/prompt-collection/issues"
   },
-  "homepage": "https://github.com/dhorvathdh/claude-code-templates#readme",
+  "homepage": "https://github.com/ByborgAI/prompt-collection#readme",
   "files": [
     "bin/",
     "src/",

@@ -391,10 +391,10 @@ async function installIndividualAgent(agentName, targetDir, options) {
     let githubUrl;
     if (agentName.includes('/')) {
       // Category/agent format: deep-research-team/academic-researcher
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/agents/${agentName}.md`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/agents/${agentName}.md`;
     } else {
       // Direct agent format: api-security-audit
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/agents/${agentName}.md`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/agents/${agentName}.md`;
     }
     
     console.log(chalk.gray(`📥 Downloading from GitHub (main branch)...`));
@@ -412,7 +412,7 @@ async function installIndividualAgent(agentName, targetDir, options) {
     const agentContent = await response.text();
     
     // Create .claude/agents directory if it doesn't exist
-    const agentsDir = path.join(targetDir, '.claude', 'agents');
+    const agentsDir = path.join(targetDir, '.claude', 'agents', 'aitt');
     await fs.ensureDir(agentsDir);
     
     // Write the agent file - always to flat .claude/agents directory
@@ -456,10 +456,10 @@ async function installIndividualCommand(commandName, targetDir, options) {
     let githubUrl;
     if (commandName.includes('/')) {
       // Category/command format: security/vulnerability-scan
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/commands/${commandName}.md`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/commands/${commandName}.md`;
     } else {
       // Direct command format: check-file
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/commands/${commandName}.md`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/commands/${commandName}.md`;
     }
     
     console.log(chalk.gray(`📥 Downloading from GitHub (main branch)...`));
@@ -477,7 +477,7 @@ async function installIndividualCommand(commandName, targetDir, options) {
     const commandContent = await response.text();
     
     // Create .claude/commands directory if it doesn't exist
-    const commandsDir = path.join(targetDir, '.claude', 'commands');
+    const commandsDir = path.join(targetDir, '.claude', 'commands', 'aitt');
     await fs.ensureDir(commandsDir);
     
     // Write the command file - always to flat .claude/commands directory
@@ -522,10 +522,10 @@ async function installIndividualMCP(mcpName, targetDir, options) {
     let githubUrl;
     if (mcpName.includes('/')) {
       // Category/mcp format: database/mysql-integration
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/mcps/${mcpName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/mcps/${mcpName}.json`;
     } else {
       // Direct mcp format: web-fetch
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/mcps/${mcpName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/mcps/${mcpName}.json`;
     }
     
     console.log(chalk.gray(`📥 Downloading from GitHub (main branch)...`));
@@ -608,10 +608,10 @@ async function installIndividualSetting(settingName, targetDir, options) {
     let githubUrl;
     if (settingName.includes('/')) {
       // Category/setting format: permissions/allow-npm-commands
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/settings/${settingName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/settings/${settingName}.json`;
     } else {
       // Direct setting format: allow-npm-commands
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/settings/${settingName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/settings/${settingName}.json`;
     }
     
     console.log(chalk.gray(`📥 Downloading from GitHub (main branch)...`));
@@ -747,7 +747,7 @@ async function installIndividualSetting(settingName, targetDir, options) {
       }
       
       // Determine target directory and file based on selection
-      const claudeDir = path.join(currentTargetDir, '.claude');
+      const claudeDir = path.join(currentTargetDir, '.claude', 'aitt');
       const targetSettingsFile = path.join(claudeDir, settingsFile);
       let existingConfig = {};
       
@@ -938,10 +938,10 @@ async function installIndividualHook(hookName, targetDir, options) {
     let githubUrl;
     if (hookName.includes('/')) {
       // Category/hook format: pre-tool/backup-before-edit
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/hooks/${hookName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/hooks/${hookName}.json`;
     } else {
       // Direct hook format: backup-before-edit
-      githubUrl = `https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/hooks/${hookName}.json`;
+      githubUrl = `https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/hooks/${hookName}.json`;
     }
     
     console.log(chalk.gray(`📥 Downloading from GitHub (main branch)...`));
@@ -1046,7 +1046,7 @@ async function installIndividualHook(hookName, targetDir, options) {
       }
       
       // Determine target directory and file based on selection
-      const claudeDir = path.join(currentTargetDir, '.claude');
+      const claudeDir = path.join(currentTargetDir, '.claude', 'aitt');
       const targetSettingsFile = path.join(claudeDir, settingsFile);
       let existingConfig = {};
       
@@ -1265,7 +1265,7 @@ async function getAvailableAgentsFromGitHub() {
     
     // If aitmpl.com API fails, try GitHub API as secondary fallback
     console.log(chalk.yellow('⚠️  Falling back to GitHub API...'));
-    const response = await fetch('https://api.github.com/repos/dhorvathdh/claude-code-templates/contents/cli-tool/components/agents');
+    const response = await fetch('https://api.github.com/repos/ByborgAI/prompt-collection/contents/cli-tool/components/agents');
     if (!response.ok) {
       // Check for rate limit error
       if (response.status === 403) {
@@ -1309,7 +1309,7 @@ async function getAvailableAgentsFromGitHub() {
       } else if (item.type === 'dir') {
         // Category directory, fetch its contents
         try {
-          const categoryResponse = await fetch(`https://api.github.com/repos/dhorvathdh/claude-code-templates/contents/cli-tool/components/agents/${item.name}`);
+          const categoryResponse = await fetch(`https://api.github.com/repos/ByborgAI/prompt-collection/contents/cli-tool/components/agents/${item.name}`);
           if (categoryResponse.ok) {
             const categoryContents = await categoryResponse.json();
             for (const categoryItem of categoryContents) {
@@ -1502,7 +1502,7 @@ async function installMultipleComponents(options, targetDir) {
         }
         
         // Save YAML to workflows directory
-        const workflowsDir = path.join(targetDir, '.claude', 'workflows');
+        const workflowsDir = path.join(targetDir, '.claude', 'workflows', 'aitt');
         const workflowFile = path.join(workflowsDir, `${workflowName}.yaml`);
         
         await fs.ensureDir(workflowsDir);
@@ -1679,7 +1679,7 @@ async function installWorkflow(workflowHash, targetDir, options) {
       yamlContent = generateWorkflowYAML(workflowData);
     }
     
-    const workflowsDir = path.join(targetDir, '.claude', 'workflows');
+    const workflowsDir = path.join(targetDir, '.claude', 'workflows', 'aitt');
     const workflowFile = path.join(workflowsDir, `${workflowData.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.yaml`);
     
     // Ensure .claude/workflows directory exists
@@ -1867,7 +1867,7 @@ async function installComponentFromWorkflow(componentData, type, targetDir, opti
     
     if (type === 'agent') {
       // Create .claude/agents directory if it doesn't exist
-      const agentsDir = path.join(targetDir, '.claude', 'agents');
+      const agentsDir = path.join(targetDir, '.claude', 'agents', 'aitt');
       await fs.ensureDir(agentsDir);
       
       // For agents, handle category subdirectories
@@ -1881,7 +1881,7 @@ async function installComponentFromWorkflow(componentData, type, targetDir, opti
       
     } else if (type === 'command') {
       // Create .claude/commands directory if it doesn't exist
-      const commandsDir = path.join(targetDir, '.claude', 'commands');
+      const commandsDir = path.join(targetDir, '.claude', 'commands', 'aitt');
       await fs.ensureDir(commandsDir);
       targetPath = path.join(commandsDir, `${fileName}.md`);
       
@@ -2389,7 +2389,7 @@ async function executeSandbox(options, targetDir) {
     const spinner = ora('Installing E2B sandbox component...').start();
     
     // Create .claude/sandbox directory
-    const sandboxDir = path.join(targetDir, '.claude', 'sandbox');
+    const sandboxDir = path.join(targetDir, '.claude', 'sandbox', 'aitt');
     await fs.ensureDir(sandboxDir);
     
     // Copy E2B component files from the installed package
@@ -2423,7 +2423,7 @@ async function executeSandbox(options, targetDir) {
         // Fallback to downloading from GitHub if not found locally
         console.log(chalk.gray('📥 Downloading E2B component files from GitHub...'));
         
-        const baseUrl = 'https://raw.githubusercontent.com/dhorvathdh/claude-code-templates/main/cli-tool/components/sandbox/e2b';
+        const baseUrl = 'https://raw.githubusercontent.com/ByborgAI/prompt-collection/aitt/sandbox/e2b';
         
         // Download launcher script
         const launcherResponse = await fetch(`${baseUrl}/e2b-launcher.py`);

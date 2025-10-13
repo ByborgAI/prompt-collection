@@ -2,8 +2,8 @@
 [![npm downloads](https://img.shields.io/npm/dt/claude-code-templates.svg)](https://www.npmjs.com/package/claude-code-templates)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dhorvathdh/claude-code-templates/blob/main/CONTRIBUTING.md)
-[![GitHub stars](https://img.shields.io/github/stars/dhorvathdh/claude-code-templates.svg?style=social&label=Star)](https://github.com/dhorvathdh/claude-code-templates)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ByborgAI/prompt-collection/blob/main/CONTRIBUTING.md)
+[![GitHub stars](https://img.shields.io/github/stars/ByborgAI/prompt-collection.svg?style=social&label=Star)](https://github.com/ByborgAI/prompt-collection)
 
 # Claude Code Templates
 
@@ -108,7 +108,7 @@ Quick links:
 
 ## 🤝 Contributing
 
-We welcome contributions! Browse available templates and components at **[aitmpl.com](https://aitmpl.com)**, then check our [contributing guidelines](https://github.com/dhorvathdh/claude-code-templates/blob/main/CONTRIBUTING.md).
+We welcome contributions! Browse available templates and components at **[aitmpl.com](https://aitmpl.com)**, then check our [contributing guidelines](https://github.com/ByborgAI/prompt-collection/blob/main/CONTRIBUTING.md).
 
 ## 📄 License
 
@@ -118,8 +118,8 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 - **🌐 Browse Components**: [aitmpl.com](https://aitmpl.com)
 - **📚 Documentation**: [docs.aitmpl.com](https://docs.aitmpl.com)
-- **🐛 Issues**: [GitHub Issues](https://github.com/dhorvathdh/claude-code-templates/issues)
-- **💬 Discussions**: [GitHub Discussions](https://github.com/dhorvathdh/claude-code-templates/discussions)
+- **🐛 Issues**: [GitHub Issues](https://github.com/ByborgAI/prompt-collection/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/ByborgAI/prompt-collection/discussions)
 
 ---
 

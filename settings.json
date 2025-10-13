@@ -13,7 +13,7 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "/by-ai:(manual-test|e2e-test)",
+        "matcher": "/aitt:(manual-test|e2e-test)",
         "hooks": [
           {
             "type": "command",

@@ -2,7 +2,7 @@
 
 # Script to create a git commit with the help of AI-generated summary
 
-# 1. Use AI to summarize changes with `claude "/by-ai:summarize-changes" -p` in the background
+# 1. Use AI to summarize changes with `claude "/aitt:summarize-changes" -p` in the background
 # 2. Find ticket number from branch name with `scripts/find-ticket-from-branch.sh`, ask for manual input if not found
 #   - Allow user to specify ticket via `--ticket <ticket>` argument => skip step and use provided ticket
 # 3. Prompt user to select commit type (feat, fix, docs, style, refactor, perf, test, chore)
@@ -107,9 +107,9 @@ trap "rm -f $SUMMARY_FILE" EXIT
 
 # Start AI summary generation in background
 if [[ "$SHORT" == "true" ]]; then
-    claude "/by-ai:summarize-changes --short" -p > "$SUMMARY_FILE" 2>&1 &
+    claude "/aitt:summarize-changes --short" -p > "$SUMMARY_FILE" 2>&1 &
 else
-    claude "/by-ai:summarize-changes" -p > "$SUMMARY_FILE" 2>&1 &
+    claude "/aitt:summarize-changes" -p > "$SUMMARY_FILE" 2>&1 &
 fi
 AI_SUMMARY_PID=$!
 

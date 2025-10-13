@@ -61,7 +61,7 @@ class HeaderComponent {
               </div>
             ` : ''}
             ${this.options.showGitHubLink ? `
-              <a href="https://github.com/dhorvathdh/claude-code-templates" target="_blank" class="github-link" title="Star on GitHub">
+              <a href="https://github.com/ByborgAI/prompt-collection" target="_blank" class="github-link" title="Star on GitHub">
                 <span class="github-icon">⭐</span>
                 Star on GitHub
               </a>
