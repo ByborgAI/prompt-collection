@@ -1,0 +1,13 @@
+{
+  "name": "prompt-collection",
+  "owner": {
+    "name": "Byborg"
+  },
+  "plugins": [
+    {
+      "name": "prompt-collection",
+      "source": ".",
+      "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management"
+    }
+  ]
+}
