@@ -1,7 +1,7 @@
 {
   "name": "prompt-collection",
   "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Byborg"
   },
