@@ -4,6 +4,15 @@ AI-driven development toolkit for Claude Code with commands and agents for testi
 
 ## Installation
 
+### Prerequisites
+
+Before installing this plugin, you must be authenticated with GitHub in your environment where you run Claude Code.
+
+**GitHub Authentication Required:**
+- Ensure you have configured your GitHub credentials
+- If you haven't set up an SSH key yet, follow GitHub's guide: [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+- Test your SSH connection: `ssh -T git@github.com`
+
 ### Via Claude Code Plugin System
 
 ```bash
