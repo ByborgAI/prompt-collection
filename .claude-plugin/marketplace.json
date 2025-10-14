@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "prompt-collection",
-      "source": "./",
+      "source": "./aitt",
       "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management"
     }
   ]
