@@ -18,6 +18,7 @@ Before installing this plugin, you must be authenticated with GitHub in your env
 ```bash
 # Add the marketplace and install the plugin
 /plugin marketplace add ByborgAI/prompt-collection
+/plugin install prompt-collection@prompt-collection
 
 # Restart Claude Code to load the plugin
 ```
@@ -26,7 +27,7 @@ Before installing this plugin, you must be authenticated with GitHub in your env
 
 ```bash
 # Clone the repository
-git clone https://github.com/ByborgAI/prompt-collection.git
+git clone git@github.com:ByborgAI/prompt-collection.git
 cd prompt-collection
 
 # Add as local marketplace
