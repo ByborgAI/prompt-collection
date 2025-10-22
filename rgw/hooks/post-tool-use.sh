@@ -57,7 +57,7 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
     if [[ -f "$file_path" ]]; then
         if yq -e '.complete == true' "$file_path" >/dev/null 2>&1; then
-            yaml=$(claude -p "read and execute ${CLAUDE_PLUGIN_ROOT}/~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-requirements.md" | awk '/^passed:/{flag=1} flag')
+            yaml=$(claude -p "read and execute ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-requirements.md" | awk '/^passed:/{flag=1} flag')
 
             passed=$(echo "$yaml" | yq -r '.passed')
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
@@ -77,7 +77,7 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
     # Only verify when the task file is created (Write tool used)
     if [[ "$tool_name" == "Write" ]] && [[ -f "$file_path" ]]; then
-        yaml=$(claude -p "read task described in $file_path and execute ${CLAUDE_PLUGIN_ROOT}/~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-task.md" | awk '/^passed:/{flag=1} flag')
+        yaml=$(claude -p "read task described in $file_path and execute ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-task.md" | awk '/^passed:/{flag=1} flag')
 
         passed=$(echo "$yaml" | yq -r '.passed')
         remarks=$(echo "$yaml" | yq -r '.remarks[]?')
@@ -96,9 +96,15 @@ if [[ -n "$file_path" ]]; then
     extension="${file_path##*.}"
 
     if [[ "$extension" == "js" ]]; then
-        commands=(
-            "npx eslint"
-        )
+        # Check if npx is available
+        if command -v npx &> /dev/null; then
+            commands=(
+                "npx --yes eslint"
+            )
+        else
+            # Skip JS linting if npx not available
+            exit 0
+        fi
     elif [[ "$extension" == "yaml" || "$extension" == "yml" ]]; then
         commands=(
             "yq eval ."
@@ -108,9 +114,17 @@ if [[ -n "$file_path" ]]; then
     fi
 
     for cmd in "${commands[@]}"; do
-        if ! $cmd "$file_path" 1>&2; then
-            echo "Command failed: $cmd for $file_path" >&2
-            exit 2
+        # Use timeout if available, otherwise run directly
+        if command -v timeout &> /dev/null; then
+            if ! timeout 30 $cmd "$file_path" 1>&2; then
+                echo "Command failed: $cmd for $file_path" >&2
+                exit 2
+            fi
+        else
+            if ! $cmd "$file_path" 1>&2; then
+                echo "Command failed: $cmd for $file_path" >&2
+                exit 2
+            fi
         fi
     done
 fi
