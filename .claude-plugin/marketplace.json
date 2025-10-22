@@ -5,9 +5,14 @@
   },
   "plugins": [
     {
-      "name": "prompt-collection",
+      "name": "aitt",
       "source": "./aitt",
       "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management"
+    },
+    {
+      "name": "rgw",
+      "source": "./rgw",
+      "description": "Requirement Gathering Workflow - A structured workflow for gathering requirements, generating tasks, and executing them systematically with automated git integration"
     }
   ]
 }

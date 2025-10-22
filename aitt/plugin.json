@@ -1,0 +1,11 @@
+{
+  "name": "aitt",
+  "version": "1.0.0",
+  "description": "AI-driven development toolkit with commands and agents for testing, code review, and commit management",
+  "author": {
+    "name": "Byborg"
+  },
+  "keywords": ["testing", "code-review", "commit", "automation", "development"],
+  "agents": "./agents",
+  "commands": "./commands"
+}

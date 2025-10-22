@@ -1,0 +1,14 @@
+{
+  "name": "rgw",
+  "version": "1.0.0",
+  "description": "Requirement Gathering Workflow - A structured workflow for gathering requirements, generating tasks, and executing them systematically",
+  "author": {
+    "name": "Byborg"
+  },
+  "homepage": "https://github.com/ByborgAI/prompt-collection/tree/main/rgw",
+  "repository": "https://github.com/ByborgAI/prompt-collection",
+  "license": "MIT",
+  "keywords": ["requirements", "workflow", "planning", "task-management", "project-management"],
+  "commands": "./commands",
+  "hooks": "./hooks/hooks.json"
+}
