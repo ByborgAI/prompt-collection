@@ -18,30 +18,16 @@ Before installing this plugin, you must be authenticated with GitHub in your env
 ```bash
 # Add the marketplace and install the plugin
 /plugin marketplace add ByborgAI/prompt-collection
-/plugin install prompt-collection@prompt-collection
+/plugin install aitt@prompt-collection
 
 # Restart Claude Code to load the plugin
-```
-
-### Local Development
-
-```bash
-# Clone the repository
-git clone git@github.com:ByborgAI/prompt-collection.git
-cd prompt-collection
-
-# Add as local marketplace
-/plugin marketplace add .
-
-# Install the plugin
-/plugin install prompt-collection@prompt-collection
 ```
 
 ## Available Commands
 
 ### Code Quality & Review
 
-#### `/prompt-collection:code-review [branch]`
+#### `/aitt:code-review [branch]`
 Comprehensive code analysis across quality, security, performance, and architecture domains.
 
 **Features:**
@@ -52,13 +38,13 @@ Comprehensive code analysis across quality, security, performance, and architect
 
 **Usage:**
 ```bash
-/prompt-collection:code-review
-/prompt-collection:code-review main
+/aitt:code-review
+/aitt:code-review main
 ```
 
 ### Git & Commit Management
 
-#### `/prompt-collection:commit-suggest [--breaking] [--type <type>] [--ticket <ticket>]`
+#### `/aitt:commit-suggest [--breaking] [--type <type>] [--ticket <ticket>]`
 Suggests conventional commit messages based on current changes.
 
 **Features:**
@@ -68,23 +54,23 @@ Suggests conventional commit messages based on current changes.
 
 **Usage:**
 ```bash
-/prompt-collection:commit-suggest
-/prompt-collection:commit-suggest --type feat
-/prompt-collection:commit-suggest --ticket PROJ-123
+/aitt:commit-suggest
+/aitt:commit-suggest --type feat
+/aitt:commit-suggest --ticket PROJ-123
 ```
 
-#### `/prompt-collection:summarize-changes [--short]`
+#### `/aitt:summarize-changes [--short]`
 Quick summary of current changes using git diff.
 
 **Usage:**
 ```bash
-/prompt-collection:summarize-changes
-/prompt-collection:summarize-changes --short
+/aitt:summarize-changes
+/aitt:summarize-changes --short
 ```
 
 ### Testing
 
-#### `/prompt-collection:write-unit-tests [file_to_test]`
+#### `/aitt:write-unit-tests [file_to_test]`
 Generate unit and integration tests for new or existing code.
 
 **Features:**
@@ -94,11 +80,11 @@ Generate unit and integration tests for new or existing code.
 
 **Usage:**
 ```bash
-/prompt-collection:write-unit-tests
-/prompt-collection:write-unit-tests src/utils/auth.ts
+/aitt:write-unit-tests
+/aitt:write-unit-tests src/utils/auth.ts
 ```
 
-#### `/prompt-collection:manual-test [production_url] [commit_hash] [--no-verify]`
+#### `/aitt:manual-test [production_url] [commit_hash] [--no-verify]`
 Manual testing of changes in production with Playwright MCP.
 
 **Features:**
@@ -108,25 +94,25 @@ Manual testing of changes in production with Playwright MCP.
 
 **Usage:**
 ```bash
-/prompt-collection:manual-test https://example.com abc123
-/prompt-collection:manual-test https://example.com abc123 --no-verify
+/aitt:manual-test https://example.com abc123
+/aitt:manual-test https://example.com abc123 --no-verify
 ```
 
-#### `/prompt-collection:e2e-test:plan`
+#### `/aitt:e2e-test:plan`
 Explore website and plan e2e test scenarios.
 
 **Usage:**
 ```bash
-/prompt-collection:e2e-test:plan https://example.com
+/aitt:e2e-test:plan https://example.com
 ```
 
-#### `/prompt-collection:e2e-test:write [test_plan_section]`
+#### `/aitt:e2e-test:write [test_plan_section]`
 Write e2e Playwright tests based on test plan.
 
 **Usage:**
 ```bash
-/prompt-collection:e2e-test:write
-/prompt-collection:e2e-test:write "User Authentication"
+/aitt:e2e-test:write
+/aitt:e2e-test:write "User Authentication"
 ```
 
 ## Available Agents
