@@ -78,15 +78,39 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
         new_has_status=false
 
         # Parse status from old_string (format: "status: <value>" or "status: \"<value>\"" or "status: '<value>'")
-        if [[ "$old_string" =~ ^status:[[:space:]]*[\"\']*([^\"\']+)[\"\']*$ ]]; then
-            current_status="${BASH_REMATCH[1]}"
-            old_has_status=true
+        # Use grep to extract just the status line, handling multiline strings
+        # Use grep -m 1 to only get the first match in case of multiline content
+        if status_line=$(echo "$old_string" | grep -m 1 -E '^status:[[:space:]]*'); then
+            # Match quoted or unquoted status values (including multi-word statuses)
+            if [[ "$status_line" =~ ^status:[[:space:]]*\"([^\"]+)\" ]]; then
+                current_status="${BASH_REMATCH[1]}"
+                old_has_status=true
+            elif [[ "$status_line" =~ ^status:[[:space:]]*\'([^\']+)\' ]]; then
+                current_status="${BASH_REMATCH[1]}"
+                old_has_status=true
+            elif [[ "$status_line" =~ ^status:[[:space:]]*(.+)$ ]]; then
+                # For unquoted values, capture everything after "status:" until end of line
+                current_status=$(echo "${BASH_REMATCH[1]}" | sed 's/[[:space:]]*$//')
+                old_has_status=true
+            fi
         fi
 
         # Parse status from new_string (format: "status: <value>" or "status: \"<value>\"" or "status: '<value>'")
-        if [[ "$new_string" =~ ^status:[[:space:]]*[\"\']*([^\"\']+)[\"\']*$ ]]; then
-            new_status="${BASH_REMATCH[1]}"
-            new_has_status=true
+        # Use grep to extract just the status line, handling multiline strings
+        # Use grep -m 1 to only get the first match in case of multiline content
+        if status_line=$(echo "$new_string" | grep -m 1 -E '^status:[[:space:]]*'); then
+            # Match quoted or unquoted status values (including multi-word statuses)
+            if [[ "$status_line" =~ ^status:[[:space:]]*\"([^\"]+)\" ]]; then
+                new_status="${BASH_REMATCH[1]}"
+                new_has_status=true
+            elif [[ "$status_line" =~ ^status:[[:space:]]*\'([^\']+)\' ]]; then
+                new_status="${BASH_REMATCH[1]}"
+                new_has_status=true
+            elif [[ "$status_line" =~ ^status:[[:space:]]*(.+)$ ]]; then
+                # For unquoted values, capture everything after "status:" until end of line
+                new_status=$(echo "${BASH_REMATCH[1]}" | sed 's/[[:space:]]*$//')
+                new_has_status=true
+            fi
         fi
 
         # Check for status field removal
@@ -184,8 +208,16 @@ if [[ -n "$file_path" ]]; then
 
         # Check if the new status will be "done"
         new_status=""
-        if [[ "$new_string" =~ ^status:[[:space:]]*[\"\']*([^\"\']+)[\"\']*$ ]]; then
-            new_status="${BASH_REMATCH[1]}"
+        if status_line=$(echo "$new_string" | grep -m 1 -E '^status:[[:space:]]*'); then
+            # Match quoted or unquoted status values (including multi-word statuses)
+            if [[ "$status_line" =~ ^status:[[:space:]]*\"([^\"]+)\" ]]; then
+                new_status="${BASH_REMATCH[1]}"
+            elif [[ "$status_line" =~ ^status:[[:space:]]*\'([^\']+)\' ]]; then
+                new_status="${BASH_REMATCH[1]}"
+            elif [[ "$status_line" =~ ^status:[[:space:]]*(.+)$ ]]; then
+                # For unquoted values, capture everything after "status:" until end of line
+                new_status=$(echo "${BASH_REMATCH[1]}" | sed 's/[[:space:]]*$//')
+            fi
         fi
 
         if [[ "$new_status" == "done" ]]; then
