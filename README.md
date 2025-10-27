@@ -68,6 +68,28 @@ Quick summary of current changes using git diff.
 /aitt:summarize-changes --short
 ```
 
+#### `/aitt:update-npm-packages [--target <patch|minor|major>] [--package <name>] [--safe] [--skip <pkg1,pkg2,...>] [--audit-level <low|moderate|high|critical>]`
+Continuously updates NPM packages one at a time, verifies each update, and commits them automatically.
+
+**Features:**
+- Automated one-package-at-a-time update workflow
+- Changelog research and documentation
+- Security audit checks with configurable thresholds
+- Automatic verification (TypeScript, tests, build)
+- Individual git commits per update
+- Safe mode for manual approval
+
+**Usage:**
+```bash
+/aitt:update-npm-packages
+/aitt:update-npm-packages --target patch
+/aitt:update-npm-packages --target minor
+/aitt:update-npm-packages --package react
+/aitt:update-npm-packages --safe
+/aitt:update-npm-packages --skip react,eslint,chalk
+/aitt:update-npm-packages --audit-level high
+```
+
 ### Testing
 
 #### `/aitt:write-unit-tests [file_to_test]`
