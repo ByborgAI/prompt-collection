@@ -27,34 +27,34 @@ fi
 
 # If there are missing dependencies, display installation instructions
 if [ ${#missing_deps[@]} -gt 0 ]; then
-    echo "⚠️  Missing required dependencies for rgw workflow hooks:" >&2
-    echo "" >&2
+    echo "⚠️  Missing required dependencies for rgw workflow hooks:"
+    echo ""
 
     for dep in "${missing_deps[@]}"; do
         case "$dep" in
             yq)
-                echo "  📦 yq (YAML processor)" >&2
-                echo "     macOS:  brew install yq" >&2
-                echo "     Linux:  https://github.com/mikefarah/yq#install" >&2
-                echo "" >&2
+                echo "  📦 yq (YAML processor)"
+                echo "     macOS:  brew install yq"
+                echo "     Linux:  https://github.com/mikefarah/yq#install"
+                echo ""
                 ;;
             node)
-                echo "  📦 Node.js (JavaScript runtime)" >&2
-                echo "     macOS:  brew install node" >&2
-                echo "     Linux:  https://nodejs.org/en/download/package-manager" >&2
-                echo "" >&2
+                echo "  📦 Node.js (JavaScript runtime)"
+                echo "     macOS:  brew install node"
+                echo "     Linux:  https://nodejs.org/en/download/package-manager"
+                echo ""
                 ;;
             npx)
-                echo "  📦 npx (npm package runner)" >&2
-                echo "     Usually installed with Node.js" >&2
-                echo "     If missing: npm install -g npx" >&2
-                echo "" >&2
+                echo "  📦 npx (npm package runner)"
+                echo "     Usually installed with Node.js"
+                echo "     If missing: npm install -g npx"
+                echo ""
                 ;;
         esac
     done
 
-    echo "  ℹ️  Install the missing dependencies to enable full hook functionality." >&2
-    echo "" >&2
+    echo "  ℹ️  Install the missing dependencies to enable full hook functionality."
+    echo ""
 fi
 
 exit 0
