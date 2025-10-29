@@ -1,6 +1,6 @@
 {
   "name": "rgw",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Requirement Gathering Workflow - A structured workflow for gathering requirements, generating tasks, and executing them systematically",
   "author": {
     "name": "Byborg"
