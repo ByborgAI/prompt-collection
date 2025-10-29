@@ -12,18 +12,31 @@ if ! command -v yq &> /dev/null; then
     exit 0
 fi
 
-if ! command -v jq &> /dev/null; then
-    echo "Warning: jq is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install jq" >&2
-    echo "  Linux: sudo apt-get install jq (Debian/Ubuntu) or sudo yum install jq (RHEL/CentOS)" >&2
+if ! command -v node &> /dev/null; then
+    echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install node" >&2
+    echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
     exit 0
+fi
+
+if ! command -v npx &> /dev/null; then
+    echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
+    echo "  npm install -g npx" >&2
+    exit 0
+fi
+
+# Determine which JSON command to use (prefer installed json, fallback to npx)
+if command -v json &> /dev/null; then
+    JSON_CMD="json"
+else
+    JSON_CMD="npx -y json"
 fi
 
 # Read JSON input
 json=$(cat)
 
 # Extract file path
-file_path=$(echo "$json" | jq -r '.tool_input.file_path // empty')
+file_path=$(echo "$json" | $JSON_CMD tool_input.file_path 2>/dev/null || echo "")
 
 # ============================================================================
 # PART 2: Verify Task
@@ -32,8 +45,8 @@ file_path=$(echo "$json" | jq -r '.tool_input.file_path // empty')
 if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
     if [[ -f "$file_path" ]]; then
         # Extract old and new status from the hook JSON
-        old_string=$(echo "$json" | jq -r '.tool_input.old_string // empty')
-        new_string=$(echo "$json" | jq -r '.tool_input.new_string // empty')
+        old_string=$(echo "$json" | $JSON_CMD tool_input.old_string 2>/dev/null || echo "")
+        new_string=$(echo "$json" | $JSON_CMD tool_input.new_string 2>/dev/null || echo "")
 
         current_status=""
         new_status=""
@@ -167,7 +180,7 @@ if [[ -n "$file_path" ]]; then
     # Check if this is a task file that will be modified
     if [[ "$filename" =~ ^task-.*\.ya?ml$ ]] && [[ -f "$file_path" ]]; then
         # Extract new status from the hook JSON
-        new_string=$(echo "$json" | jq -r '.tool_input.new_string // empty')
+        new_string=$(echo "$json" | $JSON_CMD tool_input.new_string 2>/dev/null || echo "")
 
         # Check if the new status will be "done"
         new_status=""

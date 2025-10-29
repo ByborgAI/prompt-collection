@@ -12,19 +12,32 @@ if ! command -v yq &> /dev/null; then
     exit 0
 fi
 
-if ! command -v jq &> /dev/null; then
-    echo "Warning: jq is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install jq" >&2
-    echo "  Linux: sudo apt-get install jq (Debian/Ubuntu) or sudo yum install jq (RHEL/CentOS)" >&2
+if ! command -v node &> /dev/null; then
+    echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install node" >&2
+    echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
     exit 0
+fi
+
+if ! command -v npx &> /dev/null; then
+    echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
+    echo "  npm install -g npx" >&2
+    exit 0
+fi
+
+# Determine which JSON command to use (prefer installed json, fallback to npx)
+if command -v json &> /dev/null; then
+    JSON_CMD="json"
+else
+    JSON_CMD="npx -y json"
 fi
 
 # Read JSON input
 json=$(cat)
 
 # Extract file path and tool name
-file_path=$(echo "$json" | jq -r '.tool_response.filePath // empty')
-tool_name=$(echo "$json" | jq -r '.tool_name // empty')
+file_path=$(echo "$json" | $JSON_CMD tool_response.filePath 2>/dev/null || echo "")
+tool_name=$(echo "$json" | $JSON_CMD tool_name 2>/dev/null || echo "")
 
 # ============================================================================
 # PART 0: Track Changed Files in In-Progress Task
