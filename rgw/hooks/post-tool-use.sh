@@ -1,6 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ============================================================================
+# PART -1: Check if required commands are installed
+# ============================================================================
+
+if ! command -v yq &> /dev/null; then
+    echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install yq" >&2
+    echo "  Linux: https://github.com/mikefarah/yq#install" >&2
+    exit 0
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "Warning: jq is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install jq" >&2
+    echo "  Linux: sudo apt-get install jq (Debian/Ubuntu) or sudo yum install jq (RHEL/CentOS)" >&2
+    exit 0
+fi
+
 # Read JSON input
 json=$(cat)
 
@@ -63,6 +81,7 @@ if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
 
             if [[ "$passed" == "false" ]]; then
+                echo "Requirements verification failed:" >&2
                 echo "$remarks" >&2
                 exit 2
             fi
@@ -82,6 +101,7 @@ if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
         passed=$(echo "$yaml" | yq -r '.passed')
         remarks=$(echo "$yaml" | yq -r '.remarks[]?')
         if [[ "$passed" == "false" ]]; then
+            echo "Task verification failed:" >&2
             echo "$remarks" >&2
             exit 2
         fi
@@ -95,17 +115,7 @@ fi
 if [[ -n "$file_path" ]]; then
     extension="${file_path##*.}"
 
-    if [[ "$extension" == "js" ]]; then
-        # Check if npx is available
-        if command -v npx &> /dev/null; then
-            commands=(
-                "npx --yes eslint"
-            )
-        else
-            # Skip JS linting if npx not available
-            exit 0
-        fi
-    elif [[ "$extension" == "yaml" || "$extension" == "yml" ]]; then
+    if [[ "$extension" == "yaml" || "$extension" == "yml" ]]; then
         commands=(
             "yq eval ."
         )

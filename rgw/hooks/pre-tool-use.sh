@@ -1,66 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ============================================================================
+# PART -1: Check if required commands are installed
+# ============================================================================
+
+if ! command -v yq &> /dev/null; then
+    echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install yq" >&2
+    echo "  Linux: https://github.com/mikefarah/yq#install" >&2
+    exit 0
+fi
+
+if ! command -v jq &> /dev/null; then
+    echo "Warning: jq is not installed. Install it to enable hook functionality." >&2
+    echo "  macOS: brew install jq" >&2
+    echo "  Linux: sudo apt-get install jq (Debian/Ubuntu) or sudo yum install jq (RHEL/CentOS)" >&2
+    exit 0
+fi
+
 # Read JSON input
 json=$(cat)
 
 # Extract file path
 file_path=$(echo "$json" | jq -r '.tool_input.file_path // empty')
-
-# Define monitored extensions array
-monitored_extensions=("js" "ts")
-
-# ============================================================================
-# PART 1: Verify Execution State
-# ============================================================================
-
-# If no file path, skip validation
-if [[ -n "$file_path" ]]; then
-    # Extract file extension
-    file_extension="${file_path##*.}"
-
-    # Check if extension is in monitored array
-    is_monitored=false
-    for ext in "${monitored_extensions[@]}"; do
-        if [[ "$file_extension" == "$ext" ]]; then
-            is_monitored=true
-            break
-        fi
-    done
-
-    # If an monitored extension, check execution state
-    if [[ "$is_monitored" == true ]]; then
-        # Check if any task files exist
-        task_files_exist=false
-        for task_file in task-*.yaml task-*.yml; do
-            if [[ -f "$task_file" ]]; then
-                task_files_exist=true
-                break
-            fi
-        done
-
-        # If task files exist, check if any have "status: in progress"
-        if [[ "$task_files_exist" == true ]]; then
-            task_in_progress=false
-            for task_file in task-*.yaml task-*.yml; do
-                if [[ -f "$task_file" ]]; then
-                    if grep -q "^status:\s*in\s*progress" "$task_file" || \
-                       grep -q "^status:\s*['\"]in progress['\"]" "$task_file"; then
-                        task_in_progress=true
-                        break
-                    fi
-                fi
-            done
-
-            # If task files exist but none are in progress, block the operation
-            if [[ "$task_in_progress" == false ]]; then
-                ext_list=$(IFS=,; echo "${monitored_extensions[*]}")
-                echo "Cannot modify $file_path: Task files exist but none have 'status: in progress'." >&2
-                exit 2
-            fi
-        fi
-    fi
-fi
 
 # ============================================================================
 # PART 2: Verify Task
