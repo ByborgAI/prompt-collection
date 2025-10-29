@@ -9,20 +9,20 @@ if ! command -v yq &> /dev/null; then
     echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
     echo "  macOS: brew install yq" >&2
     echo "  Linux: https://github.com/mikefarah/yq#install" >&2
-    exit 0
+    exit 2
 fi
 
 if ! command -v node &> /dev/null; then
     echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
     echo "  macOS: brew install node" >&2
     echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
-    exit 0
+    exit 2
 fi
 
 if ! command -v npx &> /dev/null; then
     echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
     echo "  npm install -g npx" >&2
-    exit 0
+    exit 2
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -216,8 +216,8 @@ if [[ -n "$file_path" ]]; then
                 for file in "${changed_files_array[@]}"; do
                     if [[ -n "$file" ]] && [[ -f "$file" ]]; then
                         if ! git add "$file" 2>&1 >&2; then
-                            echo "Failed to stage file: $file" >&2
-                            exit 2
+                        echo "Failed to stage file: $file" >&2
+                        exit 2
                         fi
                     fi
                 done
@@ -228,7 +228,7 @@ if [[ -n "$file_path" ]]; then
                         echo "Failed to commit changes for task $filename" >&2
                         exit 2
                     fi
-                    echo "Committed changes for task $filename" >&2
+                    echo "Committed changes for task $filename"
                 fi
             fi
         fi

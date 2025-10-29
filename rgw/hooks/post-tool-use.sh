@@ -9,20 +9,20 @@ if ! command -v yq &> /dev/null; then
     echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
     echo "  macOS: brew install yq" >&2
     echo "  Linux: https://github.com/mikefarah/yq#install" >&2
-    exit 0
+    exit 2
 fi
 
 if ! command -v node &> /dev/null; then
     echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
     echo "  macOS: brew install node" >&2
     echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
-    exit 0
+    exit 2
 fi
 
 if ! command -v npx &> /dev/null; then
     echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
     echo "  npm install -g npx" >&2
-    exit 0
+    exit 2
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -94,9 +94,9 @@ if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
 
             if [[ "$passed" == "false" ]]; then
-                echo "Requirements verification failed:" >&2
-                echo "$remarks" >&2
-                exit 2
+            echo "Requirements verification failed:" >&2
+            echo "$remarks" >&2
+            exit 2
             fi
         fi
     fi

@@ -55,6 +55,8 @@ if [ ${#missing_deps[@]} -gt 0 ]; then
 
     echo "  ℹ️  Install the missing dependencies to enable full hook functionality."
     echo ""
+else
+    echo "✅ rgw workflow hooks: All required dependencies are installed."
 fi
 
 exit 0
