@@ -128,16 +128,66 @@ Explore website and plan e2e test scenarios.
 /aitt:e2e-test:plan https://example.com
 ```
 
-#### `/aitt:e2e-test:write [test_plan_section]`
-Write e2e Playwright tests based on test plan.
+$1
+
+### Requirement Gathering Workflow
+
+The RGW plugin provides a structured three-phase workflow for software development projects. Use the commands in this sequence:
+
+#### 1. `/rgw:plan` - Requirement Gathering
+Interactive requirement gathering to capture project requirements and generate requirements.yaml.
+
+**What it does:**
+- Asks clarifying questions about your project
+- Captures all functional and technical requirements
+- Generates `requirements.yaml` file for your review and approval
+- Stops after requirements are approved (does NOT create tasks)
 
 **Usage:**
 ```bash
-/aitt:e2e-test:write
-/aitt:e2e-test:write "User Authentication"
+/rgw:plan
 ```
 
-## Available Agents
+#### 2. `/rgw:task-creation` - Task Generation
+Converts requirements.yaml into actionable task files without executing them.
+
+**What it does:**
+- Reads approved `requirements.yaml`
+- Breaks down requirements into sequential tasks
+- Creates `task-XXX.yaml` files in project root
+- Plans task dependencies and execution order
+- Stops after tasks are generated (does NOT execute)
+
+**Usage:**
+```bash
+/rgw:task-creation
+```
+
+#### 3. `/rgw:execute [task_file]` - Task Execution
+Execute generated tasks with status tracking and auto-commit.
+
+**What it does:**
+- Executes tasks one by one or all sequentially
+- Updates task status (to do → in progress → under review → done)
+- Tracks all file changes per task
+- Requests user review before marking complete
+- Auto-commits changes when task is marked "done"
+- Enforces workflow rules via hooks
+
+**Usage:**
+```bash
+# Execute all tasks sequentially
+/rgw:execute
+
+# Execute a specific task
+/rgw:execute task-001.yaml
+```
+
+**Prerequisites:**
+- `jq` - JSON processor (install via `brew install jq` on macOS)
+- `yq` - YAML processor (install via `brew install yq` on macOS)
+
+$2
 
 The plugin includes specialized agents for complex workflows:
 
