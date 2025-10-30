@@ -128,7 +128,14 @@ Explore website and plan e2e test scenarios.
 /aitt:e2e-test:plan https://example.com
 ```
 
-$1
+#### `/aitt:e2e-test:write [test_plan_section]`
+Write e2e Playwright tests based on test plan.
+
+**Usage:**
+```bash
+/aitt:e2e-test:write
+/aitt:e2e-test:write "User Authentication"
+```
 
 ### Requirement Gathering Workflow
 
@@ -187,7 +194,7 @@ Execute generated tasks with status tracking and auto-commit.
 - `jq` - JSON processor (install via `brew install jq` on macOS)
 - `yq` - YAML processor (install via `brew install yq` on macOS)
 
-$2
+## Available Agents
 
 The plugin includes specialized agents for complex workflows:
 
