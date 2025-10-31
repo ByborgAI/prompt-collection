@@ -35,8 +35,11 @@ fi
 # Read JSON input
 json=$(cat)
 
-# Extract file path
+# Extract file path (try both file_path and relative_path for Serena MCP tools)
 file_path=$(echo "$json" | $JSON_CMD tool_input.file_path 2>/dev/null || echo "")
+if [[ -z "$file_path" ]]; then
+    file_path=$(echo "$json" | $JSON_CMD tool_input.relative_path 2>/dev/null || echo "")
+fi
 
 # ============================================================================
 # PART 2: Verify Task

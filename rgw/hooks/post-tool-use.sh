@@ -36,7 +36,12 @@ fi
 json=$(cat)
 
 # Extract file path and tool name
+# For Write/Edit tools, the file path is in tool_response.filePath
+# For Serena MCP tools, we need to get it from the tool_input.relative_path
 file_path=$(echo "$json" | $JSON_CMD tool_response.filePath 2>/dev/null || echo "")
+if [[ -z "$file_path" ]]; then
+    file_path=$(echo "$json" | $JSON_CMD tool_input.relative_path 2>/dev/null || echo "")
+fi
 tool_name=$(echo "$json" | $JSON_CMD tool_name 2>/dev/null || echo "")
 
 # ============================================================================
@@ -107,8 +112,8 @@ fi
 # ============================================================================
 
 if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
-    # Only verify when the task file is created (Write tool used)
-    if [[ "$tool_name" == "Write" ]] && [[ -f "$file_path" ]]; then
+    # Only verify when the task file is created (Write or mcp__serena__create_text_file tool used)
+    if [[ "$tool_name" == "Write" || "$tool_name" == "mcp__serena__create_text_file" ]] && [[ -f "$file_path" ]]; then
         yaml=$(claude -p "read task described in $file_path and execute ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-task.md" | awk '/^passed:/{flag=1} flag')
 
         passed=$(echo "$yaml" | yq -r '.passed')
