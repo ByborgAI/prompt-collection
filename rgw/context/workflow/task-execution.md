@@ -9,7 +9,7 @@ IMPORTANT: tasks files must have an up-to date status field. always make sure th
 - If an under review task was found, ask the user to approve the changes before proceeding
 - Execute each step in sequence, one by one
 - After each step, validate your work by checking it against the step's acceptance criteria
-- After all steps are completed, always stop and wait for user approval to continue with the next step. The changes MUST FULFILL requirements described in the `validation` array.
+- After all steps are completed, the changes MUST FULFILL requirements described in the `validation` array.
   - IF the `validation` requirements are not fulfilled, undo the changes and start over
   - IF the `validation` requirements are fulfilled:
     - Ask the User to review the changes, and wait for their acceptance
