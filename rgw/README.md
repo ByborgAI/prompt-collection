@@ -21,12 +21,10 @@ This plugin provides a comprehensive workflow for software development projects:
 
 ### Install the Plugin
 
-1. Install the plugin via Claude Code CLI:
-   ```bash
-   claude plugins install path/to/rgw
+1. Install the plugin:
    ```
-
-   Or via Claude Code by referencing the plugin directory.
+   /plugin install rgw@prompt-collection
+   ```
 
 2. (Optional) Add file permissions to your project's `.claude/settings.json` if you want to restrict access:
    ```json
