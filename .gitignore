@@ -2,3 +2,10 @@
 
 # Crush AI assistant files
 .crush
+
+# Hook log files
+pre-tool-use.json
+post-tool-use.json
+*.jsonl
+**/__pycache__/
+
