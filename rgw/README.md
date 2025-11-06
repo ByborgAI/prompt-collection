@@ -23,7 +23,8 @@ This plugin provides a comprehensive workflow for software development projects:
 
 1. Install the plugin via Claude Code CLI:
    ```bash
-   claude plugins install path/to/rgw
+   /plugin marketplace add ByborgAI/prompt-collection
+   /plugin install rgw@prompt-collection
    ```
 
    Or via Claude Code by referencing the plugin directory.
@@ -109,7 +110,7 @@ rgw/
 ├── commands/                      # Slash commands
 │   ├── plan.md                   # /rgw:plan command
 │   └── execute.md                # /rgw:execute command
-├── ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/                       # Workflow documentation & standards
+├── context/                       # Workflow documentation & standards
 │   ├── workflow/
 │   │   ├── requirement-gathering.md
 │   │   ├── task-generation.md

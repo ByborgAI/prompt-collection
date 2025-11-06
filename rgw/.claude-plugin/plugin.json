@@ -8,7 +8,5 @@
   "homepage": "https://github.com/ByborgAI/prompt-collection/tree/main/rgw",
   "repository": "https://github.com/ByborgAI/prompt-collection",
   "license": "MIT",
-  "keywords": ["requirements", "workflow", "planning", "task-management", "project-management"],
-  "commands": "./commands",
-  "hooks": "./hooks/hooks.json"
+  "keywords": ["requirements", "workflow", "planning", "task-management", "project-management"]
 }

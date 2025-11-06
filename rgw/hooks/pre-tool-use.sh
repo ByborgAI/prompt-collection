@@ -6,23 +6,42 @@ set -euo pipefail
 # ============================================================================
 
 if ! command -v yq &> /dev/null; then
-    echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install yq" >&2
-    echo "  Linux: https://github.com/mikefarah/yq#install" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "yq is not installed. Install it to enable hook functionality.\n  macOS: brew install yq\n  Linux: https://github.com/mikefarah/yq#install"
+  }
+}
+EOF
+    exit 0
 fi
 
 if ! command -v node &> /dev/null; then
-    echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install node" >&2
-    echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Node.js is not installed. Install it to enable hook functionality.\n  macOS: brew install node\n  Linux: https://nodejs.org/en/download/package-manager"
+  }
+}
+EOF
+    exit 0
 fi
 
 if ! command -v npx &> /dev/null; then
-    echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
-    echo "  npm install -g npx" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "npx is not installed. Install it to enable hook functionality.\n  npm install -g npx"
+  }
+}
+EOF
+    exit 0
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -91,8 +110,16 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
 
         # Check for status field removal
         if [[ "$old_has_status" == true && "$new_has_status" == false ]]; then
-            echo "Removal of status field is not allowed" >&2
-            exit 2
+            cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Removal of status field is not allowed"
+  }
+}
+EOF
+            exit 0
         fi
 
         # Define valid transitions
@@ -132,9 +159,16 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
             [[ -z "$expected_next" ]] && expected_next="<none>"
 
             if [[ "$valid_transition" == false ]]; then
-                echo "Invalid status transition: '${current_status:-<empty>}' → '$new_status'" >&2
-                echo "Expected: '${current_status:-<empty>}' → '${expected_next}'" >&2
-                exit 2
+                cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Invalid status transition: '${current_status:-<empty>}' → '$new_status'\\nExpected: '${current_status:-<empty>}' → '${expected_next}'"
+  }
+}
+EOF
+                exit 0
             fi
         fi
 
@@ -160,8 +194,16 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
                     if [[ "$task_file" != "$current_basename" && -f "$task_file" ]]; then
                         other_status=$(extract_file_status "$task_file")
                         if [[ "$other_status" == "under review" ]]; then
-                            echo "Cannot set task to 'in progress' while $task_file is 'under review'" >&2
-                            exit 2
+                            cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Cannot set task to 'in progress' while $task_file is 'under review'"
+  }
+}
+EOF
+                            exit 0
                         fi
                     fi
                 done
@@ -216,8 +258,16 @@ if [[ -n "$file_path" ]]; then
                 for file in "${changed_files_array[@]}"; do
                     if [[ -n "$file" ]] && [[ -f "$file" ]]; then
                         if ! git add "$file" 2>&1 >&2; then
-                        echo "Failed to stage file: $file" >&2
-                        exit 2
+                            cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Failed to stage file: $file"
+  }
+}
+EOF
+                            exit 0
                         fi
                     fi
                 done
@@ -225,8 +275,16 @@ if [[ -n "$file_path" ]]; then
                 # Create the commit with the task's commit message
                 if ! git diff --cached --quiet 2>/dev/null; then
                     if ! git commit -m "$commit_message" > >(cat >&2) 2>&1; then
-                        echo "Failed to commit changes for task $filename" >&2
-                        exit 2
+                        cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "Failed to commit changes for task $filename"
+  }
+}
+EOF
+                        exit 0
                     fi
                     echo "Committed changes for task $filename"
                 fi

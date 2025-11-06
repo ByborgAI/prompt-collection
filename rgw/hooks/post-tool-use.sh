@@ -6,23 +6,45 @@ set -euo pipefail
 # ============================================================================
 
 if ! command -v yq &> /dev/null; then
-    echo "Warning: yq is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install yq" >&2
-    echo "  Linux: https://github.com/mikefarah/yq#install" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "decision": "block",
+  "reason": "yq is not installed. Install it to enable hook functionality.\n  macOS: brew install yq\n  Linux: https://github.com/mikefarah/yq#install",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "yq command not found, install it to proceed."
+  }
+}
+EOF
+    exit 0
 fi
 
 if ! command -v node &> /dev/null; then
-    echo "Warning: Node.js is not installed. Install it to enable hook functionality." >&2
-    echo "  macOS: brew install node" >&2
-    echo "  Linux: https://nodejs.org/en/download/package-manager" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "decision": "block",
+  "reason": "Node.js is not installed. Install it to enable hook functionality.\n  macOS: brew install node\n  Linux: https://nodejs.org/en/download/package-manager",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "Node.js command not found, install it to proceed."
+  }
+}
+EOF
+    exit 0
 fi
 
 if ! command -v npx &> /dev/null; then
-    echo "Warning: npx is not installed. Install it to enable hook functionality." >&2
-    echo "  npm install -g npx" >&2
-    exit 2
+    cat <<'EOF'
+{
+  "decision": "block",
+  "reason": "npx is not installed. Install it to enable hook functionality.\n  npm install -g npx",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse",
+    "additionalContext": "npx command not found, install it to proceed."
+  }
+}
+EOF
+    exit 0
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -94,9 +116,16 @@ if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
 
             if [[ "$passed" == "false" ]]; then
-            echo "Requirements verification failed:" >&2
-            echo "$remarks" >&2
-            exit 2
+                cat <<EOF
+{
+  "decision": "block",
+  "reason": "Requirements verification failed and needs fixing with the following reasons:\\n$remarks",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse"
+  }
+}
+EOF
+                exit 0
             fi
         fi
     fi
@@ -114,9 +143,16 @@ if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
         passed=$(echo "$yaml" | yq -r '.passed')
         remarks=$(echo "$yaml" | yq -r '.remarks[]?')
         if [[ "$passed" == "false" ]]; then
-            echo "Task verification failed:" >&2
-            echo "$remarks" >&2
-            exit 2
+            cat <<EOF
+{
+  "decision": "block",
+  "reason": "Task verification failed and needs fixing with the following reasons:\\n$remarks",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse"
+  }
+}
+EOF
+            exit 0
         fi
     fi
 fi
@@ -140,13 +176,16 @@ if [[ -n "$file_path" ]]; then
         # Use timeout if available, otherwise run directly
         if command -v timeout &> /dev/null; then
             if ! timeout 30 $cmd "$file_path" 1>&2; then
-                echo "Command failed: $cmd for $file_path" >&2
-                exit 2
-            fi
-        else
-            if ! $cmd "$file_path" 1>&2; then
-                echo "Command failed: $cmd for $file_path" >&2
-                exit 2
+                cat <<EOF
+{
+  "decision": "block",
+  "reason": "Command failed: $cmd for $file_path",
+  "hookSpecificOutput": {
+    "hookEventName": "PostToolUse"
+  }
+}
+EOF
+                exit 0
             fi
         fi
     done

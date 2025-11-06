@@ -1,16 +1,19 @@
 # Requirement gathering
 
-Read and follow communication standards described in `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/standards/communication-standards.md` (relative to project root)
+Read and follow communication standards described in `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/standards/communication-standards.md` 
 
 Collaboratively discover comprehensive requirements with the User through efficient, iterative analysis.
 
 IMPORTANT: output of this step is the sole input for task generation. IT MUST BE comprehensive and technically precise. 
 
+## Variables
+SYNTAX_REQUIREMENTS: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/requirements-syntax.md`
+
 ## Workflow
 
 1. Search repository for existing patterns, similar implementations, and architectural decisions
 2. Think hard to determine complexity, approach (integration/implementation), and affected files
-3. Collect a set of questions and put them in `requirements.yaml` (in project root) file based on `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/requirements-syntax.md` (relative to project root)
+3. Collect a set of questions and put them in `requirements.yaml` (in project root) file based on <SYNTAX_REQUIREMENTS> 
 4. Prioritize questions in this order:
    a. Architecture & Approach: Core technical decisions
    b. Dependencies & Integration: External systems, libraries, APIs, interfaces, types

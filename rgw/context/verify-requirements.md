@@ -1,5 +1,8 @@
 # Verifying requirements gathering output
 
+## Variables
+WORKFLOW_GATHERING: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/requirement-gathering.md`
+
 ## Response format
 
 ```yaml
@@ -15,9 +18,9 @@ DO NOT provide comments, feedback or response other than the yaml. AVOID talking
 the output must be plain text in YAML format. do not use markdown framing.
 
 ## Workflow
-- read the `requirements.yaml` file (relative to project root)
+- read the `requirements.yaml` file 
 - verify if `goal` covers `original_request`
 - verify if the items in `requirements` cover all technical aspects of `original_request`. it must fulfill the following criteria:
   - must be technically thorough, explicit
   - there must not be any ambiguity
-  - must fulfill the "Output Quality Check" section of `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/requirement-gathering.md` (relative to project root)
+  - must fulfill the "Output Quality Check" section of <WORKFLOW_GATHERING> 

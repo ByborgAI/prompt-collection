@@ -27,36 +27,51 @@ fi
 
 # If there are missing dependencies, display installation instructions
 if [ ${#missing_deps[@]} -gt 0 ]; then
-    echo "⚠️  Missing required dependencies for rgw workflow hooks:"
-    echo ""
+    message="⚠️  Missing required dependencies for rgw workflow hooks:\\n\\n"
 
     for dep in "${missing_deps[@]}"; do
         case "$dep" in
             yq)
-                echo "  📦 yq (YAML processor)"
-                echo "     macOS:  brew install yq"
-                echo "     Linux:  https://github.com/mikefarah/yq#install"
-                echo ""
+                message+="  📦 yq (YAML processor)\\n"
+                message+="     macOS:  brew install yq\\n"
+                message+="     Linux:  https://github.com/mikefarah/yq#install\\n"
+                message+="\\n"
                 ;;
             node)
-                echo "  📦 Node.js (JavaScript runtime)"
-                echo "     macOS:  brew install node"
-                echo "     Linux:  https://nodejs.org/en/download/package-manager"
-                echo ""
+                message+="  📦 Node.js (JavaScript runtime)\\n"
+                message+="     macOS:  brew install node\\n"
+                message+="     Linux:  https://nodejs.org/en/download/package-manager\\n"
+                message+="\\n"
                 ;;
             npx)
-                echo "  📦 npx (npm package runner)"
-                echo "     Usually installed with Node.js"
-                echo "     If missing: npm install -g npx"
-                echo ""
+                message+="  📦 npx (npm package runner)\\n"
+                message+="     Usually installed with Node.js\\n"
+                message+="     If missing: npm install -g npx\\n"
+                message+="\\n"
                 ;;
         esac
     done
 
-    echo "  ℹ️  Install the missing dependencies to enable full hook functionality."
-    echo ""
+    message+="  ℹ️  Install the missing dependencies to enable full hook functionality."
+
+    cat <<EOF
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "$message"
+  }
+}
+EOF
 else
-    echo "✅ rgw workflow hooks: All required dependencies are installed."
+    cat <<'EOF'
+{
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "✅ rgw workflow hooks: All required dependencies are installed."
+  }
+}
+EOF
 fi
 
+# Explicitly flush output
 exit 0

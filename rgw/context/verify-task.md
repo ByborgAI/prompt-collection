@@ -1,5 +1,8 @@
 # Verifying task generation output
 
+## Variables
+WORKFLOW_TASK_GENERATION:  `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/task-generation.md`
+
 ## Response format
 
 ```yaml
@@ -18,4 +21,4 @@ the output must be plain text in YAML format. do not use markdown framing.
 - verify if the task fulfills the following criteria:
   - prerequisites mention explicitly to read and follow to at least one standards file
   - there is no reference to `requirements.yaml`
-  - each task fulfills the "Success criteria" defined in `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/task-generation.md` (relative to project root)
+  - each task fulfills the "Success criteria" defined in <WORKFLOW_TASK_GENERATION>
