@@ -2,9 +2,11 @@
 
 IMPORTANT: tasks files must have an up-to date status field. always make sure that they are updates as task execution progresses!
 
-## Workflow
+## VARIABLES
+SYNTAX_TASK: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/task-syntax.md`
 
-- Read and strictly follow task syntax schema defined in `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/task-syntax.md` 
+## Workflow
+- Read and strictly follow task syntax schema defined in <SYNTAX_TASK>
 - Read and make sure all prerequsites are met
 - Update the task file status to indicate progress, review and completed states
 - If an under review task was found, ask the user to approve the changes before proceeding
