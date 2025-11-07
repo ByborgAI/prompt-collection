@@ -7,6 +7,7 @@ SYNTAX_TASK: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/synta
 STANDARDS_CODING: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/standards/coding-standards.md`
 
 ## Steps
+- **For REPLAN scenarios**: Delete all existing `task-*.yaml` files in the project root before generating new ones
 - Read and analyze the `requirements.yaml` (in project root) file thoroughly
 - Follow task syntax schema defined in <SYNTAX_TASK>
 - Identify phases and their prerequisites
