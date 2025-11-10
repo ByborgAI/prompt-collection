@@ -9,7 +9,7 @@ WORKFLOW_REPLAN: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/w
 
 ### Phase 1: Prerequisites Check
 - Tell the user in a clearly visible way, that you understand and are following this workflow.
-- Check if `requirements.yaml` exists in the project root using the Read tool
+- Check if `requirements.yaml` exists in the project root using a simple bash command, do not read it's content yet.
 - If `requirements.yaml` EXISTS:
   - Use the AskUserQuestion tool to present these options:
     - **Option 1: Fresh Plan** - Create a new plan from scratch (will delete existing requirements.yaml and all task-*.yaml files)
