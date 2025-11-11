@@ -11,9 +11,14 @@ SYNTAX_REQUIREMENTS: `~/.claude/plugins/marketplaces/prompt-collection/rgw/conte
 
 ## Workflow
 
+### Context Check
+- Determine if this is a FRESH PLAN or continuation of existing work
+- If continuing/replanning, preserve context from existing requirements
+
+### Main Workflow
 1. Search repository for existing patterns, similar implementations, and architectural decisions
 2. Think hard to determine complexity, approach (integration/implementation), and affected files
-3. Collect a set of questions and put them in `requirements.yaml` (in project root) file based on <SYNTAX_REQUIREMENTS> 
+3. Collect a set of questions and put them in `requirements.yaml` (in project root) file based on <SYNTAX_REQUIREMENTS>
 4. Prioritize questions in this order:
    a. Architecture & Approach: Core technical decisions
    b. Dependencies & Integration: External systems, libraries, APIs, interfaces, types
