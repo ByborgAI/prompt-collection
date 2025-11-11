@@ -21,7 +21,7 @@ WORKFLOW_REPLAN: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/w
   - Proceed with normal planning workflow
 
 ### Phase 2: Planning Process
-- Wait for the User to ask a question and give you an instruction!
+- Wait for the User to ask a question or give you an instruction!
 - If this is a FRESH PLAN or NO EXISTING requirements:
   - Start by gathering requirements, as defined in <WORKFLOW_GATHERING>
   - Request approval from user on the requirements gathered
