@@ -2,11 +2,17 @@
 set -euo pipefail
 
 # ============================================================================
+# Load Logger Library
+# ============================================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/logger.sh"
+
+# ============================================================================
 # PART -1: Check if required commands are installed
 # ============================================================================
 
 if ! command -v yq &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -15,11 +21,14 @@ if ! command -v yq &> /dev/null; then
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "pre-tool-use" "$output"
+    echo "$output"
+    exit 1
 fi
 
 if ! command -v node &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -28,11 +37,14 @@ if ! command -v node &> /dev/null; then
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "pre-tool-use" "$output"
+    echo "$output"
+    exit 1
 fi
 
 if ! command -v npx &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -41,7 +53,10 @@ if ! command -v npx &> /dev/null; then
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "pre-tool-use" "$output"
+    echo "$output"
+    exit 1
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -113,7 +128,7 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
 
         # Check for status field removal
         if [[ "$old_has_status" == true && "$new_has_status" == false ]]; then
-            cat <<'EOF'
+            output=$(cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -122,6 +137,9 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
   }
 }
 EOF
+)
+            log_hook_output "pre-tool-use" "$output"
+            echo "$output"
             exit 0
         fi
 
@@ -162,7 +180,7 @@ EOF
             [[ -z "$expected_next" ]] && expected_next="<none>"
 
             if [[ "$valid_transition" == false ]]; then
-                cat <<EOF
+                output=$(cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -171,7 +189,10 @@ EOF
   }
 }
 EOF
-                exit 0
+)
+                log_hook_output "pre-tool-use" "$output"
+                echo "$output"
+                exit 1
             fi
         fi
 
@@ -197,7 +218,7 @@ EOF
                     if [[ "$task_file" != "$current_basename" && -f "$task_file" ]]; then
                         other_status=$(extract_file_status "$task_file")
                         if [[ "$other_status" == "under review" ]]; then
-                            cat <<EOF
+                            output=$(cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -206,7 +227,10 @@ EOF
   }
 }
 EOF
-                            exit 0
+)
+                            log_hook_output "pre-tool-use" "$output"
+                            echo "$output"
+                            exit 1
                         fi
                     fi
                 done
@@ -261,7 +285,7 @@ if [[ -n "$file_path" ]]; then
                 for file in "${changed_files_array[@]}"; do
                     if [[ -n "$file" ]] && [[ -f "$file" ]]; then
                         if ! git add "$file" 2>&1 >&2; then
-                            cat <<EOF
+                            output=$(cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -270,7 +294,10 @@ if [[ -n "$file_path" ]]; then
   }
 }
 EOF
-                            exit 0
+)
+                            log_hook_output "pre-tool-use" "$output"
+                            echo "$output"
+                            exit 1
                         fi
                     fi
                 done
@@ -278,7 +305,7 @@ EOF
                 # Create the commit with the task's commit message
                 if ! git diff --cached --quiet 2>/dev/null; then
                     if ! git commit -m "$commit_message" > >(cat >&2) 2>&1; then
-                        cat <<EOF
+                        output=$(cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
@@ -287,7 +314,10 @@ EOF
   }
 }
 EOF
-                        exit 0
+)
+                        log_hook_output "pre-tool-use" "$output"
+                        echo "$output"
+                        exit 1
                     fi
                     echo "Committed changes for task $filename"
                 fi
@@ -296,5 +326,6 @@ EOF
     fi
 fi
 
-# All checks passed
+# All checks passed - log successful execution with no blocking output
+log_hook_output "pre-tool-use" ""
 exit 0
