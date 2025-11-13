@@ -9,3 +9,4 @@ post-tool-use.json
 *.jsonl
 **/__pycache__/
 
+.rgw-logs

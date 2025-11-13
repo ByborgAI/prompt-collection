@@ -1,7 +1,7 @@
 # Verifying task generation output
 
 ## Variables
-WORKFLOW_TASK_GENERATION:  `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/task-generation.md`
+WORKFLOW_TASK_GENERATION:  `${CLAUDE_PLUGIN_ROOT}/context/workflow/task-generation.md`
 
 ## Response format
 

@@ -1,13 +1,13 @@
 # Requirement gathering
 
-Read and follow communication standards described in `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/standards/communication-standards.md` 
+Read and follow communication standards described in `${CLAUDE_PLUGIN_ROOT}/context/standards/communication-standards.md` 
 
 Collaboratively discover comprehensive requirements with the User through efficient, iterative analysis.
 
 IMPORTANT: output of this step is the sole input for task generation. IT MUST BE comprehensive and technically precise. 
 
 ## Variables
-SYNTAX_REQUIREMENTS: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/requirements-syntax.md`
+SYNTAX_REQUIREMENTS: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/requirements-syntax.md`
 
 ## Workflow
 

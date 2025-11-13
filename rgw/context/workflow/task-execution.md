@@ -3,7 +3,7 @@
 IMPORTANT: tasks files must have an up-to date status field. always make sure that they are updates as task execution progresses!
 
 ## VARIABLES
-SYNTAX_TASK: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/task-syntax.md`
+SYNTAX_TASK: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
 
 ## Workflow
 - Read and strictly follow task syntax schema defined in <SYNTAX_TASK>

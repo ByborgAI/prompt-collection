@@ -3,8 +3,8 @@
 Convert the requirements into actionable, sequenced tasks that can be executed individually.
 
 ## VARIABLES
-SYNTAX_TASK: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/task-syntax.md`
-STANDARDS_CODING: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/standards/coding-standards.md`
+SYNTAX_TASK: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
+STANDARDS_CODING: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
 
 ## Steps
 - Read and analyze the `requirements.yaml` (in project root) file thoroughly

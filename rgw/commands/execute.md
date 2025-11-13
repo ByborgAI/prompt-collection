@@ -1,7 +1,7 @@
 Executes the previously created tasklist.
 
 ## Variables
-WORKFLOW_TASK_EXECUTION: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/task-execution.md`
+WORKFLOW_TASK_EXECUTION: `${CLAUDE_PLUGIN_ROOT}/context/workflow/task-execution.md`
 
 ## Workflow
 - follow the task execution workflow as described in <WORKFLOW_TASK_EXECUTION>

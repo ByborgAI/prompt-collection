@@ -1,7 +1,7 @@
 # Verifying requirements gathering output
 
 ## Variables
-WORKFLOW_GATHERING: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/workflow/requirement-gathering.md`
+WORKFLOW_GATHERING: `${CLAUDE_PLUGIN_ROOT}/context/workflow/requirement-gathering.md`
 
 ## Response format
 

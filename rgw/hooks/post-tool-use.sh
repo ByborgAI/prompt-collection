@@ -23,6 +23,7 @@ if ! command -v yq &> /dev/null; then
 EOF
 )
     log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -39,6 +40,7 @@ if ! command -v node &> /dev/null; then
 EOF
 )
     log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -55,6 +57,7 @@ if ! command -v npx &> /dev/null; then
 EOF
 )
     log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -127,25 +130,44 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
     if [[ -f "$file_path" ]]; then
         if yq -e '.complete == true' "$file_path" >/dev/null 2>&1; then
-            yaml=$(claude -p "read and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-requirements.md" | awk '/^passed:/{flag=1} flag')
+            # Step 1: Get full Claude output
+            claude_output=$(claude -p "read and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-requirements.md")
+
+            # Step 2: Extract YAML from output, removing any markdown code fences
+            yaml=$(echo "$claude_output" | awk '/^passed:/{flag=1} flag' | sed '/^```/d')
 
             passed=$(echo "$yaml" | yq -r '.passed')
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
 
             if [[ "$passed" == "false" ]]; then
-                output=$(cat <<EOF
+                # Use jq to properly construct JSON with escaped content
+                output=$(jq -n \
+                    --arg remarks "$remarks" \
+                    --arg claude_output "$claude_output" \
+                    '{
+                        decision: "block",
+                        hookSpecificOutput: {
+                            hookEventName: "PostToolUse",
+                            additionalContext: ("Requirements verification failed and needs fixing with the following reasons:\n" + $remarks + "\n\nFull verification output:\n" + $claude_output)
+                        }
+                    }')
+                log_hook_output "post-tool-use" "$output"
+                check_and_echo_block_reason "$output"
+                echo "$output"
+                exit 1
+            else
+                # Log successful verification
+                success_output=$(cat <<EOF
 {
-  "decision": "block",
+  "decision": "allow",
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "Requirements verification failed and needs fixing with the following reasons:\\n$remarks"
+    "additionalContext": "Requirements verification passed successfully"
   }
 }
 EOF
 )
-                log_hook_output "post-tool-use" "$output"
-                echo "$output"
-                exit 1
+                log_hook_output "post-tool-use" "$success_output"
             fi
         fi
     fi
@@ -158,24 +180,44 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
     # Only verify when the task file is created (Write or mcp__serena__create_text_file tool used)
     if [[ "$tool_name" == "Write" || "$tool_name" == "mcp__serena__create_text_file" ]] && [[ -f "$file_path" ]]; then
-        yaml=$(claude -p "read task described in $file_path and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-task.md" | awk '/^passed:/{flag=1} flag')
+        # Step 1: Get full Claude output
+        claude_output=$(claude -p "read task described in $file_path and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-task.md")
+
+        # Step 2: Extract YAML from output, removing any markdown code fences
+        yaml=$(echo "$claude_output" | awk '/^passed:/{flag=1} flag' | sed '/^```/d')
 
         passed=$(echo "$yaml" | yq -r '.passed')
         remarks=$(echo "$yaml" | yq -r '.remarks[]?')
         if [[ "$passed" == "false" ]]; then
-            output=$(cat <<EOF
+            # Use jq to properly construct JSON with escaped content
+            output=$(jq -n \
+                --arg remarks "$remarks" \
+                --arg claude_output "$claude_output" \
+                '{
+                    decision: "block",
+                    hookSpecificOutput: {
+                        hookEventName: "PostToolUse",
+                        additionalContext: ("Task verification failed and needs fixing with the following reasons:\n" + $remarks + "\n\nFull verification output:\n" + $claude_output)
+                    }
+                }')
+            log_hook_output "post-tool-use" "$output"
+            check_and_echo_block_reason "$output"
+            echo "$output"
+            exit 1
+        else
+            # Log successful verification
+            task_name=$(basename "$file_path")
+            success_output=$(cat <<EOF
 {
-  "decision": "block",
+  "decision": "allow",
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "Task verification failed and needs fixing with the following reasons:\\n$remarks"
+    "additionalContext": "Task verification passed successfully for $task_name"
   }
 }
 EOF
 )
-            log_hook_output "post-tool-use" "$output"
-            echo "$output"
-            exit 0
+            log_hook_output "post-tool-use" "$success_output"
         fi
     fi
 fi
@@ -199,17 +241,19 @@ if [[ -n "$file_path" ]]; then
         # Use timeout if available, otherwise run directly
         if command -v timeout &> /dev/null; then
             if ! timeout 30 $cmd "$file_path" 1>&2; then
-                output=$(cat <<EOF
-{
-  "decision": "block",
-  "hookSpecificOutput": {
-    "hookEventName": "PostToolUse",
-    "additionalContext": "Command failed: $cmd for $file_path"
-  }
-}
-EOF
-)
+                # Use jq to properly construct JSON with escaped content
+                output=$(jq -n \
+                    --arg cmd "$cmd" \
+                    --arg file_path "$file_path" \
+                    '{
+                        decision: "block",
+                        hookSpecificOutput: {
+                            hookEventName: "PostToolUse",
+                            additionalContext: ("Command failed: " + $cmd + " for " + $file_path)
+                        }
+                    }')
                 log_hook_output "post-tool-use" "$output"
+                check_and_echo_block_reason "$output"
                 echo "$output"
                 exit 1
             fi

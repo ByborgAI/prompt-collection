@@ -23,6 +23,7 @@ if ! command -v yq &> /dev/null; then
 EOF
 )
     log_hook_output "pre-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -39,6 +40,7 @@ if ! command -v node &> /dev/null; then
 EOF
 )
     log_hook_output "pre-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -55,6 +57,7 @@ if ! command -v npx &> /dev/null; then
 EOF
 )
     log_hook_output "pre-tool-use" "$output"
+    check_and_echo_block_reason "$output"
     echo "$output"
     exit 1
 fi
@@ -139,8 +142,9 @@ if [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
 EOF
 )
             log_hook_output "pre-tool-use" "$output"
+            check_and_echo_block_reason "$output"
             echo "$output"
-            exit 0
+            exit 1
         fi
 
         # Define valid transitions
@@ -191,6 +195,7 @@ EOF
 EOF
 )
                 log_hook_output "pre-tool-use" "$output"
+                check_and_echo_block_reason "$output"
                 echo "$output"
                 exit 1
             fi
@@ -229,6 +234,7 @@ EOF
 EOF
 )
                             log_hook_output "pre-tool-use" "$output"
+                            check_and_echo_block_reason "$output"
                             echo "$output"
                             exit 1
                         fi
@@ -296,6 +302,7 @@ if [[ -n "$file_path" ]]; then
 EOF
 )
                             log_hook_output "pre-tool-use" "$output"
+                            check_and_echo_block_reason "$output"
                             echo "$output"
                             exit 1
                         fi
@@ -316,6 +323,7 @@ EOF
 EOF
 )
                         log_hook_output "pre-tool-use" "$output"
+                        check_and_echo_block_reason "$output"
                         echo "$output"
                         exit 1
                     fi
