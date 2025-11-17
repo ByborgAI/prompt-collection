@@ -3,13 +3,13 @@
 Convert the requirements into actionable, sequenced tasks that can be executed individually.
 
 ## VARIABLES
-SYNTAX_TASK: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
-STANDARDS_CODING: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
+`SyntaxTask`: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
+`StandardsCoding`: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
 
 ## Steps
 - **For REPLAN scenarios**: Delete all existing `task-*.yaml` files in the project root before generating new ones
 - Read and analyze the `requirements.yaml` (in project root) file thoroughly
-- Follow task syntax schema defined in <SYNTAX_TASK>
+- Follow task syntax schema defined in <SyntaxTask>
 - Identify phases and their prerequisites
 - Identify component dependencies, map sequence diagrams to implementation order
 - Start by checking if affected files have test coverage
@@ -21,7 +21,7 @@ STANDARDS_CODING: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
   - ensure the file is created with complete task breakdown ready for isolated execution and strictly matches the required syntax.
   - avoid referring to `requirements.yaml`
   - give proper context to the agent executing the task, by adding applicable standards to prerequisites:
-    - all coding tasks must require <STANDARDS_CODING> to be read and strictly followed (be explicit about this)
+    - all coding tasks must require <StandardsCoding> to be read and strictly followed (be explicit about this)
   - write a clear, concise commit message for the changes, strictly adhering to existing standards in the repository
 
 ## Success criteria
