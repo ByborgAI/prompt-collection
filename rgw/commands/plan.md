@@ -1,35 +1,19 @@
 Based on user defined requirements gather questions to clarify.
 
-## Prerequisite Steps - Gather File Contents
+## Variables
 
-### WORKFLOW_GATHERING Content and Dependencies
-Before starting requirement gathering, execute these bash commands to load the workflow and its dependencies:
-```bash
-# Main workflow file
-cat ${CLAUDE_PLUGIN_ROOT}/context/workflow/requirement-gathering.md
+### Requirement Gathering Variables
+- `WorkflowRequirementGathering`: `${CLAUDE_PLUGIN_ROOT}/context/workflow/requirement-gathering.md`
+- `CommunicationStandards`: `${CLAUDE_PLUGIN_ROOT}/context/standards/communication-standards.md`
+- `RequirementsSyntax`: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/requirements-syntax.md`
 
-# Dependencies referenced in WORKFLOW_GATHERING
-cat ${CLAUDE_PLUGIN_ROOT}/context/standards/communication-standards.md
-cat ${CLAUDE_PLUGIN_ROOT}/context/syntaxes/requirements-syntax.md
-```
+### Task Generation Variables
+- `WorkflowTaskGeneration`: `${CLAUDE_PLUGIN_ROOT}/context/workflow/task-generation.md`
+- `TaskSyntax`: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
+- `CodingStandards`: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
 
-### WORKFLOW_TASK_GENERATION Content and Dependencies
-Before starting task generation, execute these bash commands to load the workflow and its dependencies:
-```bash
-# Main workflow file
-cat ${CLAUDE_PLUGIN_ROOT}/context/workflow/task-generation.md
-
-# Dependencies referenced in WORKFLOW_TASK_GENERATION
-cat ${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md
-cat ${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md
-```
-
-### WORKFLOW_REPLAN Content and Dependencies
-Before starting replan process, execute these bash commands to load the workflow and its dependencies:
-```bash
-# Main workflow file
-cat ${CLAUDE_PLUGIN_ROOT}/context/workflow/replan.md
-```
+### Replan Variables
+- `WorkflowReplan`: `${CLAUDE_PLUGIN_ROOT}/context/workflow/replan.md`
 
 ## Workflow
 
@@ -43,22 +27,20 @@ cat ${CLAUDE_PLUGIN_ROOT}/context/workflow/replan.md
   - Based on user's choice:
     - If **Fresh Plan**: Delete `requirements.yaml` and all `task-*.yaml` files, then proceed with normal planning
     - If **Replan**:
-      - First, execute the bash command to print WORKFLOW_REPLAN content (see Prerequisite Steps above)
-      - Follow the REPLAN workflow as defined in the output
+      - Follow the REPLAN workflow as defined in <WorkflowReplan>
 - If `requirements.yaml` DOES NOT EXIST:
   - Proceed with normal planning workflow
 
 ### Phase 2: Planning Process
 - Wait for the User to ask a question or give you an instruction!
 - If this is a FRESH PLAN or NO EXISTING requirements:
-  - First, execute the bash command to print WORKFLOW_GATHERING content (see Prerequisite Steps above)
-  - Start by gathering requirements, as defined in the output from WORKFLOW_GATHERING
+  - Start by gathering requirements, as defined in <WorkflowRequirementGathering>
   - Once all requirements are gathered, present a summary to the user
   - **IMPORTANT**: Request explicit approval from user on the requirements gathered
   - If user approves, update `requirements.yaml` (in project root) to represent the latest requirement-gathering state
   - **STOP HERE** - Do NOT proceed to Phase 3 automatically
 - If this is a REPLAN:
-  - Follow the replan workflow as defined in the output from WORKFLOW_REPLAN
+  - Follow the replan workflow as defined in <WorkflowReplan>
   - Iterate through existing requirements and gather additional/modified requirements
   - Once replanning is complete, present the updated requirements to the user
   - **IMPORTANT**: Request explicit approval from user on the updated requirements
@@ -68,6 +50,5 @@ cat ${CLAUDE_PLUGIN_ROOT}/context/workflow/replan.md
 ### Phase 3: Task Generation (User Approval Required)
 - **IMPORTANT**: This phase requires explicit user permission. Ask: "Requirements gathering is complete. Would you like me to proceed with generating the task list?"
 - Only proceed if the user explicitly approves task generation
-- First, execute the bash command to print WORKFLOW_TASK_GENERATION content (see Prerequisite Steps above)
-- Create a list of tasks, as defined in the output from WORKFLOW_TASK_GENERATION
+- Create a list of tasks, as defined in <WorkflowTaskGeneration>
 - After the task list is generated, your work is done. DO NOT start working on the tasks!
