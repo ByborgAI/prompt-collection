@@ -7,6 +7,7 @@ SYNTAX_TASK: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
 STANDARDS_CODING: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
 
 ## Steps
+- **For REPLAN scenarios**: Delete all existing `task-*.yaml` files in the project root before generating new ones
 - Read and analyze the `requirements.yaml` (in project root) file thoroughly
 - Follow task syntax schema defined in <SYNTAX_TASK>
 - Identify phases and their prerequisites

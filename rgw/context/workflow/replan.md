@@ -71,7 +71,8 @@ SYNTAX_REQUIREMENTS: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/requirements-syntax
 
 ### Important Notes
 - Preserve all existing requirements unless explicitly modified
-- Maintain the structure defined in <SYNTAX_REQUIREMENTS>
+- Maintain the structure defined in <
+>
 - Ensure backward compatibility where possible
 - Document the reason for significant changes in requirement details
 - Keep track of what changed to inform task regeneration
