@@ -3,7 +3,7 @@
 This workflow is used when updating an existing requirements.yaml file with additional or modified requirements.
 
 ## Variables
-SYNTAX_REQUIREMENTS: `~/.claude/plugins/marketplaces/prompt-collection/rgw/context/syntaxes/requirements-syntax.md`
+`SyntaxRequirements`: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/requirements-syntax.md`
 
 ## Workflow
 
@@ -71,7 +71,7 @@ SYNTAX_REQUIREMENTS: `~/.claude/plugins/marketplaces/prompt-collection/rgw/conte
 
 ### Important Notes
 - Preserve all existing requirements unless explicitly modified
-- Maintain the structure defined in <SYNTAX_REQUIREMENTS>
+- Maintain the structure defined in <SyntaxRequirements>
 - Ensure backward compatibility where possible
 - Document the reason for significant changes in requirement details
 - Keep track of what changed to inform task regeneration

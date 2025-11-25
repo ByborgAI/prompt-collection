@@ -2,6 +2,12 @@
 set -euo pipefail
 
 # ============================================================================
+# Load Logger Library
+# ============================================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/logger.sh"
+
+# ============================================================================
 # Session Start Hook - Check Required Dependencies
 # ============================================================================
 # This hook runs at the start of each Claude Code session to verify that
@@ -54,7 +60,7 @@ if [ ${#missing_deps[@]} -gt 0 ]; then
 
     message+="  ℹ️  Install the missing dependencies to enable full hook functionality."
 
-    cat <<EOF
+    output=$(cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
@@ -62,8 +68,11 @@ if [ ${#missing_deps[@]} -gt 0 ]; then
   }
 }
 EOF
+)
+    log_hook_output "session-start" "$output"
+    echo "$output"
 else
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
@@ -71,6 +80,9 @@ else
   }
 }
 EOF
+)
+    log_hook_output "session-start" "$output"
+    echo "$output"
 fi
 
 # Explicitly flush output
