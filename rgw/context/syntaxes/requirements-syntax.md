@@ -38,6 +38,7 @@ success_criteria: [string]
 
 # Usage Guidelines
 
+- IMPORTANT: write proper YAML, be mindful about important characters, like ˙#` or ':', put strings in proper quotations
 - Keep descriptions concise and clear
 - Use arrays for lists to maintain order
 - Mark individual requirement statuses as "pending" or "answered"
