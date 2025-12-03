@@ -1,4 +1,6 @@
-Executes the previously created tasklist.
+---
+description: Executes the previously created tasklist.
+---
 
 ## Variables
 - `WorkflowTaskExecution`: `${CLAUDE_PLUGIN_ROOT}/context/workflow/task-execution.md`
