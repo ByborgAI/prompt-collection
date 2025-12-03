@@ -1,4 +1,7 @@
-Based on user defined requirements gather questions to clarify.
+---
+description: Based on user defined requirements gather questions to clarify.
+model: claude-opus-4-5
+---
 
 ## Variables
 
