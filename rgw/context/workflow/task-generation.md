@@ -4,7 +4,6 @@ Convert the requirements into actionable, sequenced tasks that can be executed i
 
 ## VARIABLES
 `SyntaxTask`: `${CLAUDE_PLUGIN_ROOT}/context/syntaxes/task-syntax.md`
-`StandardsCoding`: `${CLAUDE_PLUGIN_ROOT}/context/standards/coding-standards.md`
 
 ## Steps
 - **For REPLAN scenarios**: Delete all existing `task-*.yaml` files in the project root before generating new ones
