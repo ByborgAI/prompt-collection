@@ -1,7 +1,6 @@
 ---
 name: Task executor
 description: Use this agent when writing code and tests for a single task
-model: opus
 permissionMode: acceptEdits
 ---
 
