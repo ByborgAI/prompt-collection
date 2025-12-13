@@ -2,49 +2,64 @@
 set -euo pipefail
 
 # ============================================================================
+# Load Logger Library
+# ============================================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/logger.sh"
+
+# ============================================================================
 # PART -1: Check if required commands are installed
 # ============================================================================
 
 if ! command -v yq &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "decision": "block",
-  "reason": "yq is not installed. Install it to enable hook functionality.\n  macOS: brew install yq\n  Linux: https://github.com/mikefarah/yq#install",
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "yq command not found, install it to proceed."
+    "additionalContext": "yq is not installed. Install it to enable hook functionality.\n  macOS: brew install yq\n  Linux: https://github.com/mikefarah/yq#install"
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
+    echo "$output"
+    exit 1
 fi
 
 if ! command -v node &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "decision": "block",
-  "reason": "Node.js is not installed. Install it to enable hook functionality.\n  macOS: brew install node\n  Linux: https://nodejs.org/en/download/package-manager",
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "Node.js command not found, install it to proceed."
+    "additionalContext": "Node.js is not installed. Install it to enable hook functionality.\n  macOS: brew install node\n  Linux: https://nodejs.org/en/download/package-manager"
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
+    echo "$output"
+    exit 1
 fi
 
 if ! command -v npx &> /dev/null; then
-    cat <<'EOF'
+    output=$(cat <<'EOF'
 {
   "decision": "block",
-  "reason": "npx is not installed. Install it to enable hook functionality.\n  npm install -g npx",
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "npx command not found, install it to proceed."
+    "additionalContext": "npx is not installed. Install it to enable hook functionality.\n  npm install -g npx"
   }
 }
 EOF
-    exit 0
+)
+    log_hook_output "post-tool-use" "$output"
+    check_and_echo_block_reason "$output"
+    echo "$output"
+    exit 1
 fi
 
 # Determine which JSON command to use (prefer installed json, fallback to npx)
@@ -115,22 +130,44 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" == *"requirements.yaml" ]]; then
     if [[ -f "$file_path" ]]; then
         if yq -e '.complete == true' "$file_path" >/dev/null 2>&1; then
-            yaml=$(claude -p "read and execute ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-requirements.md" | awk '/^passed:/{flag=1} flag')
+            # Step 1: Get full Claude output
+            claude_output=$(claude -p "read and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-requirements.md")
+
+            # Step 2: Extract YAML from output, removing any markdown code fences
+            yaml=$(echo "$claude_output" | awk '/^passed:/{flag=1} flag' | sed '/^```/d')
 
             passed=$(echo "$yaml" | yq -r '.passed')
             remarks=$(echo "$yaml" | yq -r '.remarks[]?')
 
             if [[ "$passed" == "false" ]]; then
-                cat <<EOF
+                # Use jq to properly construct JSON with escaped content
+                output=$(jq -n \
+                    --arg remarks "$remarks" \
+                    --arg claude_output "$claude_output" \
+                    '{
+                        decision: "block",
+                        hookSpecificOutput: {
+                            hookEventName: "PostToolUse",
+                            additionalContext: ("Requirements verification failed and needs fixing with the following reasons:\n" + $remarks + "\n\nFull verification output:\n" + $claude_output)
+                        }
+                    }')
+                log_hook_output "post-tool-use" "$output"
+                check_and_echo_block_reason "$output"
+                echo "$output"
+                exit 1
+            else
+                # Log successful verification
+                success_output=$(cat <<EOF
 {
-  "decision": "block",
-  "reason": "Requirements verification failed and needs fixing with the following reasons:\\n$remarks",
+  "decision": "allow",
   "hookSpecificOutput": {
-    "hookEventName": "PostToolUse"
+    "hookEventName": "PostToolUse",
+    "additionalContext": "Requirements verification passed successfully"
   }
 }
 EOF
-                exit 0
+)
+                log_hook_output "post-tool-use" "$success_output"
             fi
         fi
     fi
@@ -143,21 +180,44 @@ fi
 if [[ -n "$file_path" ]] && [[ "$file_path" =~ task-[0-9]+\.yaml$ ]]; then
     # Only verify when the task file is created (Write or mcp__serena__create_text_file tool used)
     if [[ "$tool_name" == "Write" || "$tool_name" == "mcp__serena__create_text_file" ]] && [[ -f "$file_path" ]]; then
-        yaml=$(claude -p "read task described in $file_path and execute ~/.claude/plugins/marketplaces/prompt-collection/rgw/context/verify-task.md" | awk '/^passed:/{flag=1} flag')
+        # Step 1: Get full Claude output
+        claude_output=$(claude -p "read task described in $file_path and execute ${CLAUDE_PLUGIN_ROOT}/context/verify-task.md")
+
+        # Step 2: Extract YAML from output, removing any markdown code fences
+        yaml=$(echo "$claude_output" | awk '/^passed:/{flag=1} flag' | sed '/^```/d')
 
         passed=$(echo "$yaml" | yq -r '.passed')
         remarks=$(echo "$yaml" | yq -r '.remarks[]?')
         if [[ "$passed" == "false" ]]; then
-            cat <<EOF
+            # Use jq to properly construct JSON with escaped content
+            output=$(jq -n \
+                --arg remarks "$remarks" \
+                --arg claude_output "$claude_output" \
+                '{
+                    decision: "block",
+                    hookSpecificOutput: {
+                        hookEventName: "PostToolUse",
+                        additionalContext: ("Task verification failed and needs fixing with the following reasons:\n" + $remarks + "\n\nFull verification output:\n" + $claude_output)
+                    }
+                }')
+            log_hook_output "post-tool-use" "$output"
+            check_and_echo_block_reason "$output"
+            echo "$output"
+            exit 1
+        else
+            # Log successful verification
+            task_name=$(basename "$file_path")
+            success_output=$(cat <<EOF
 {
-  "decision": "block",
-  "reason": "Task verification failed and needs fixing with the following reasons:\\n$remarks",
+  "decision": "allow",
   "hookSpecificOutput": {
-    "hookEventName": "PostToolUse"
+    "hookEventName": "PostToolUse",
+    "additionalContext": "Task verification passed successfully for $task_name"
   }
 }
 EOF
-            exit 0
+)
+            log_hook_output "post-tool-use" "$success_output"
         fi
     fi
 fi
@@ -181,20 +241,26 @@ if [[ -n "$file_path" ]]; then
         # Use timeout if available, otherwise run directly
         if command -v timeout &> /dev/null; then
             if ! timeout 30 $cmd "$file_path" 1>&2; then
-                cat <<EOF
-{
-  "decision": "block",
-  "reason": "Command failed: $cmd for $file_path",
-  "hookSpecificOutput": {
-    "hookEventName": "PostToolUse"
-  }
-}
-EOF
-                exit 0
+                # Use jq to properly construct JSON with escaped content
+                output=$(jq -n \
+                    --arg cmd "$cmd" \
+                    --arg file_path "$file_path" \
+                    '{
+                        decision: "block",
+                        hookSpecificOutput: {
+                            hookEventName: "PostToolUse",
+                            additionalContext: ("Command failed: " + $cmd + " for " + $file_path)
+                        }
+                    }')
+                log_hook_output "post-tool-use" "$output"
+                check_and_echo_block_reason "$output"
+                echo "$output"
+                exit 1
             fi
         fi
     done
 fi
 
-# All checks passed
+# All checks passed - log successful execution with no blocking output
+log_hook_output "post-tool-use" ""
 exit 0

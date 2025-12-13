@@ -3,6 +3,8 @@
 ## Overview
 This document defines a structured YAML format for implementation task lists generated from technical plans. The format supports phase-based organization, progress tracking, dependency management, and implementation feedback collection.
 
+IMPORTANT: write proper YAML, be mindful about important characters, like ˙#`, put strings in proper quotations
+
 ## Schema
 
 ```yaml
