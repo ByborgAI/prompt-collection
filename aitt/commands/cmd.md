@@ -1,9 +1,676 @@
-# Claude Code Slash Command Schema
+---
+name: cmd
+description: Create, rewrite, or extend slash commands following the schema
+category: orchestration
+version: 1.3
+schema: aitt/commands/cmd.md
+model: opus
+input:
+  expects: "Mode and target specification"
+  required: true
+  format: conditional
+---
 
-**Version:** 1.3
-**Purpose:** Standardized structure for all slash commands in `.claude/commands/`
+> **⚠️ Schema:** This command follows `aitt/commands/cmd.md`. Read schema before modifying.
 
-This schema defines a consistent format for Claude Code slash commands, ensuring clarity, maintainability, and predictable behavior across all commands.
+# Cmd
+
+> Create, rewrite, or extend slash commands following the embedded schema specification.
+
+## Purpose
+
+This command serves as both the authoritative schema definition and an operational tool for command authorship. Use it to:
+
+- **Create** new commands from scratch with proper structure
+- **Rewrite** existing non-compliant commands to follow the schema
+- **Extend** schema-compliant commands with additional functionality
+
+**Use when:**
+- Starting a new slash command
+- Migrating legacy commands to schema compliance
+- Adding features to existing commands while maintaining structure
+
+**Do not use when:**
+- Making minor content edits (use direct file editing)
+- The target is not a slash command
+
+## Inputs
+
+**Expects:** Mode and target specification
+**Required:** Yes
+
+### Mode A: Create (with input)
+
+```
+/cmd create <command-name>
+```
+
+Creates a new command with the specified name. The command will guide you through:
+- Description and category selection
+- Command type template selection
+- Section-by-section content development
+
+**Example:**
+```
+/cmd create deploy-staging
+```
+
+### Mode B: Rewrite (with input)
+
+```
+/cmd rewrite <path-to-command>
+```
+
+Transforms an existing non-compliant command to follow the schema. Creates a `.bak` backup before modification.
+
+**Example:**
+```
+/cmd rewrite .claude/commands/worktree.md
+```
+
+### Mode C: Extend (with input)
+
+```
+/cmd extend <path-to-command>
+```
+
+Adds functionality to an existing schema-compliant command. Can modify any section or add new optional sections.
+
+**Example:**
+```
+/cmd extend .claude/commands/deploy.md
+```
+
+### Mode D: Interactive (no input)
+
+```
+/cmd
+```
+
+Prompts for mode selection when invoked without arguments.
+
+## Prerequisites
+
+### Gate 1: Valid Mode Detection
+
+**Check:** Input matches one of: `create <name>`, `rewrite <path>`, `extend <path>`, or empty
+**Pass:** Proceed to mode-specific gate
+**Fail:** Exit with usage guidance
+
+**Fail Output:**
+```
+Invalid input. Usage:
+  /cmd create <command-name>
+  /cmd rewrite <path-to-command>
+  /cmd extend <path-to-command>
+  /cmd                         (interactive mode)
+```
+
+---
+
+### Gate 2: Target Validation (rewrite/extend modes)
+
+**Check:** Target file exists at specified path
+**Pass:** Proceed to Process
+**Fail:** Exit with file not found error
+
+**Fail Output:**
+```
+Target not found: <path>
+Verify the file path and try again.
+```
+
+---
+
+### Gate 3: Schema Compliance (extend mode only)
+
+**Check:** Target command follows schema structure (has frontmatter, required sections)
+**Pass:** Proceed to Process
+**Fail:** Suggest rewrite mode instead
+
+**Fail Output:**
+```
+Target command is not schema-compliant.
+Use '/cmd rewrite <path>' to transform it first.
+```
+
+## Process
+
+### Step 1: Parse Input and Determine Mode
+
+Extract mode and target from `$ARGUMENTS`:
+
+```
+Input: ""                    → Mode: interactive
+Input: "create foo"          → Mode: create, Target: foo
+Input: "rewrite path/cmd.md" → Mode: rewrite, Target: path/cmd.md
+Input: "extend path/cmd.md"  → Mode: extend, Target: path/cmd.md
+```
+
+---
+
+### Step 2: Execute Mode-Specific Workflow
+
+#### Mode: Create
+
+##### Step 2.1: Gather Command Metadata
+
+Prompt user for:
+1. **Description** - One-line description (< 80 chars)
+2. **Category** - One of: documentation, workflow, analysis, generation, orchestration
+3. **Command Type** - One of the 5 templates (see Schema Specification)
+
+##### Step 2.2: Generate Skeleton
+
+Based on selected type, generate command skeleton:
+
+```markdown
+---
+name: <command-name>
+description: <user-provided>
+category: <user-selected>
+version: 1.0
+schema: aitt/commands/cmd.md
+input:
+  expects: "[To be defined]"
+  required: true
+  format: free-text
+---
+
+> **Schema:** This command follows `aitt/commands/cmd.md`. Read schema before modifying.
+
+# <Command Name>
+
+> <description>
+
+## Purpose
+
+[Define the command's goal and when to use it]
+
+## Inputs
+
+**Expects:** [What input the command needs]
+**Required:** [Yes | No | Conditional]
+
+[Document input format based on command needs]
+
+## Prerequisites
+
+[Define entry conditions if applicable, or remove section]
+
+## Process
+
+### Step 1: [First Action]
+
+[Describe step with implementation details]
+
+### Step 2: [Next Action]
+
+[Continue with process steps]
+
+## Outputs
+
+[Define artifacts produced, or remove section]
+
+## Examples
+
+### Basic Usage
+```
+/command-name argument
+```
+
+## Error Handling
+
+| Error | Cause | Resolution |
+|-------|-------|------------|
+| [Error type] | [Cause] | [Fix] |
+
+## References
+
+- Schema: `aitt/commands/cmd.md`
+```
+
+##### Step 2.3: Guide Content Development
+
+For each section, provide:
+1. Section purpose (from Schema Specification)
+2. Prompts for content
+3. Validation of completeness
+
+##### Step 2.4: Write Command File
+
+Write completed command to `.claude/commands/<name>.md`
+
+---
+
+#### Mode: Rewrite
+
+##### Step 2.1: Read Existing Command
+
+Read target file and analyze current structure.
+
+##### Step 2.2: Extract Intent and Content
+
+Map existing content to schema sections:
+
+| Existing Pattern | Maps To |
+|------------------|---------|
+| Inline description | Purpose section |
+| Arguments/Parameters | Inputs section |
+| Workflow/Steps | Process section |
+| Notes/Warnings | Error Handling |
+| Commands/Code | Process step implementation |
+
+##### Step 2.3: Create Backup
+
+```bash
+cp <target> <target>.bak
+```
+
+##### Step 2.4: Generate Schema-Compliant Version
+
+Transform content into schema structure while preserving:
+- Original functionality and intent
+- All process steps and logic
+- Error handling information
+- Any code examples
+
+##### Step 2.5: Present for Approval
+
+Show diff between original and transformed version. Request user approval before writing.
+
+##### Step 2.6: Write Updated File
+
+Upon approval, write schema-compliant version to target path.
+
+---
+
+#### Mode: Extend
+
+##### Step 2.1: Read Existing Command
+
+Read schema-compliant target file.
+
+##### Step 2.2: Gather Extension Requirements
+
+Prompt user for:
+- Which section(s) to modify
+- What functionality to add
+- Any new sections needed
+
+##### Step 2.3: Generate Modifications
+
+Create additions while:
+- Preserving existing structure
+- Maintaining schema compliance
+- Following section-specific formatting
+
+##### Step 2.4: Present for Approval
+
+Show proposed changes. Request user approval.
+
+##### Step 2.5: Update File
+
+Upon approval, write extended version to target path.
+
+---
+
+#### Mode: Interactive
+
+##### Step 2.1: Present Mode Selection
+
+```
+Schema Command - Select Mode:
+
+1. create  - Generate new command from scratch
+2. rewrite - Transform existing command to schema
+3. extend  - Add functionality to compliant command
+
+Enter mode and target (e.g., 'create my-command'):
+```
+
+##### Step 2.2: Route to Appropriate Mode
+
+Parse selection and execute corresponding workflow.
+
+---
+
+### Step 3: Checkpoint — Output Validation
+
+> **GATE:** Do not proceed until satisfied.
+
+- [ ] Output follows schema structure
+- [ ] All required sections present (Purpose, Process)
+- [ ] Frontmatter complete and valid
+- [ ] No schema violations detected
+
+**If not satisfied:** Return to Step 2 and correct issues.
+
+---
+
+### Step 4: Report Completion
+
+Output summary:
+- Mode executed
+- File path created/modified
+- Backup path (if rewrite mode)
+- Any warnings or notes
+
+## Outputs
+
+### Files Generated/Modified
+
+**Create mode:**
+```
+.claude/commands/<name>.md    # New command file
+```
+
+**Rewrite mode:**
+```
+<target>.bak                  # Backup of original
+<target>                      # Transformed command
+```
+
+**Extend mode:**
+```
+<target>                      # Extended command
+```
+
+### Success Output
+
+```
+Schema command completed successfully.
+
+Mode: <create|rewrite|extend>
+Target: <path>
+Status: <created|rewritten|extended>
+
+[Backup: <path>.bak]          # Rewrite mode only
+```
+
+## Validation
+
+### Check 1: Frontmatter Validity
+
+**Method:** Parse YAML frontmatter, verify required fields present
+**Required fields:** name, description, category, version
+
+**On success:** Proceed to next check
+
+**On failure:**
+1. Identify missing fields
+2. Add missing fields with appropriate values
+3. Re-validate
+
+---
+
+### Check 2: Section Completeness
+
+**Method:** Verify required sections exist (Purpose, Process minimum)
+
+**On success:** Proceed to next check
+
+**On failure:**
+1. Identify missing sections
+2. Generate placeholder content
+3. Prompt user to complete
+4. Re-validate
+
+---
+
+### Check 3: Schema Notice (for created/rewritten commands)
+
+**Method:** Verify schema notice blockquote present after frontmatter
+
+**On success:** Complete validation
+
+**On failure:**
+1. Add schema notice:
+   ```
+   > **Schema:** This command follows `aitt/commands/cmd.md`. Read schema before modifying.
+   ```
+2. Re-validate
+
+## Error Handling
+
+### ERR-001: Invalid Mode
+
+**Symptoms:** Command fails at input parsing
+**Cause:** Unrecognized mode keyword
+
+**Resolution:**
+1. Check spelling of mode (create, rewrite, extend)
+2. Ensure proper spacing between mode and target
+3. Retry with correct syntax
+
+---
+
+### ERR-002: Target Not Found
+
+**Symptoms:** Command fails at Gate 2
+**Cause:** File path incorrect or file doesn't exist
+
+**Resolution:**
+1. Verify file path is correct (relative to repo root)
+2. Check file extension (.md)
+3. Use glob to search: `**/*<partial-name>*.md`
+4. Retry with correct path
+
+---
+
+### ERR-003: Non-Compliant Target (extend mode)
+
+**Symptoms:** Command fails at Gate 3
+**Cause:** Target doesn't follow schema structure
+
+**Resolution:**
+1. Use rewrite mode first: `/cmd rewrite <target>`
+2. Then use extend mode on the rewritten command
+
+---
+
+### ERR-004: Backup Failed
+
+**Symptoms:** Rewrite mode fails before transformation
+**Cause:** Permission or disk space issue
+
+**Resolution:**
+1. Check write permissions for target directory
+2. Verify sufficient disk space
+3. Manually backup file if needed
+4. Retry operation
+
+---
+
+### ERR-005: User Rejected Changes
+
+**Symptoms:** Transformation/extension abandoned
+**Cause:** User declined approval
+
+**Resolution:**
+1. Review proposed changes
+2. Modify requirements if needed
+3. Re-run command with adjusted approach
+
+## Examples
+
+### Example 1: Create New Command
+
+**Input:**
+```
+/cmd create deploy-staging
+```
+
+**Interaction:**
+```
+Creating new command: deploy-staging
+
+Description (< 80 chars):
+> Deploys application to staging environment
+
+Category:
+1. documentation
+2. workflow
+3. analysis
+4. generation
+5. orchestration
+
+Select [1-5]: 2
+
+Command Type:
+1. Simple Action - Single focused action
+2. Delegation - Wraps base command with context
+3. Multi-Step Workflow - Orchestrates multiple steps
+4. Analysis/Report - Analyzes and produces report
+5. Documentation Generation - Creates artifacts from source
+
+Select [1-5]: 3
+
+Generating skeleton...
+
+[Skeleton presented for review]
+
+Proceed with guided content development? [Y/n]
+```
+
+**Result:**
+```
+.claude/commands/deploy-staging.md created
+```
+
+---
+
+### Example 2: Rewrite Legacy Command
+
+**Input:**
+```
+/cmd rewrite .claude/commands/worktree.md
+```
+
+**Interaction:**
+```
+Rewriting: .claude/commands/worktree.md
+
+Analyzing existing structure...
+
+Detected content:
+- Description (line 1)
+- Arguments section
+- Workflow section (5 steps)
+- Implementation details
+
+Mapping to schema sections...
+
+[Diff presented]
+
+--- Original
++++ Transformed
+
+-Create a new worktree for a branch.
++---
++name: worktree
++description: Create a new worktree for a branch
++category: workflow
++version: 1.0
++schema: aitt/commands/cmd.md
+...
+
+Backup will be created at: .claude/commands/worktree.md.bak
+
+Apply transformation? [Y/n]
+```
+
+**Result:**
+```
+Backup: .claude/commands/worktree.md.bak
+Rewritten: .claude/commands/worktree.md
+```
+
+---
+
+### Example 3: Extend Existing Command
+
+**Input:**
+```
+/cmd extend .claude/commands/deploy-staging.md
+```
+
+**Interaction:**
+```
+Extending: .claude/commands/deploy-staging.md
+
+Current sections:
+1. Purpose
+2. Inputs
+3. Process (4 steps)
+4. Outputs
+5. Error Handling
+
+What would you like to add/modify?
+> Add rollback capability to Process section
+
+Generating extension...
+
+[Proposed changes presented]
+
+### Step 5: Rollback (if deployment fails)
+
+If health check fails:
+1. Identify previous stable version
+2. Execute rollback: `kubectl rollout undo deployment/app`
+3. Verify rollback successful
+4. Report failure with rollback status
+
+Apply extension? [Y/n]
+```
+
+**Result:**
+```
+Extended: .claude/commands/deploy-staging.md
+```
+
+---
+
+### Example 4: Interactive Mode
+
+**Input:**
+```
+/cmd
+```
+
+**Interaction:**
+```
+Schema Command - Select Mode:
+
+1. create  - Generate new command from scratch
+2. rewrite - Transform existing command to schema
+3. extend  - Add functionality to compliant command
+
+Enter mode and target: create api-test
+```
+
+**Result:** Proceeds with create mode workflow.
+
+## References
+
+### Internal References
+
+- Schema Specification: See below (embedded in this command)
+- Command Types: See "Command Type Templates" section
+
+### External References
+
+- Claude Code documentation: https://docs.anthropic.com/claude-code
+
+---
+---
+
+# Schema Specification
+
+> **Version:** 1.3
+> **Purpose:** Standardized structure for all slash commands in `.claude/commands/`
+
+This specification defines a consistent format for Claude Code slash commands, ensuring clarity, maintainability, and predictable behavior across all commands.
 
 ---
 
@@ -16,7 +683,7 @@ name: command-name
 description: One-line description shown in command list
 category: documentation | workflow | analysis | generation | orchestration  # examples; custom values allowed
 version: 1.0
-schema: .claude/command-schema.md  # Reference to schema - modifications must follow this
+schema: aitt/commands/cmd.md  # Reference to schema - modifications must follow this
 input:
   expects: "Feature name and optional configuration"
   required: true
@@ -55,7 +722,7 @@ name: example-command
 description: Brief description for command listing
 category: documentation
 version: 1.0
-schema: .claude/command-schema.md  # Schema reference - modifications must follow this
+schema: aitt/commands/cmd.md  # Schema reference - modifications must follow this
 model: sonnet                    # Optional: preferred model (sonnet|opus|haiku)
 tools: [Read, Write, Glob]       # Optional: allowed tools
 mcp_servers: [chrome]            # Optional: required MCP servers
@@ -65,7 +732,7 @@ input:                           # Optional: quick input summary
   format: free-text
 ---
 
-> **⚠️ Schema:** This command follows `.claude/command-schema.md`. Read schema before modifying. If not found, ask user.
+> **Schema:** This command follows `aitt/commands/cmd.md`. Read schema before modifying. If not found, ask user.
 
 # Command Name
 
@@ -252,7 +919,7 @@ category: enum                 # See categories below
 version: semver                # Schema version (e.g., 1.0)
 author: string                 # Optional creator
 requires: [string]             # Optional dependencies
-schema: .claude/command-schema.md  # Schema this command follows (recommended)
+schema: aitt/commands/cmd.md  # Schema this command follows (recommended)
 
 # Execution Control (Optional)
 model: sonnet | opus | haiku   # Preferred Claude model
@@ -278,7 +945,7 @@ The `schema` property declares which schema this command follows. When present:
 **Required Schema Notice:**
 Commands following this schema MUST include a visible notice immediately after the frontmatter:
 ```markdown
-> **⚠️ Schema:** This command follows `.claude/command-schema.md`. Read schema before modifying. If not found, ask user.
+> **Schema:** This command follows `aitt/commands/cmd.md`. Read schema before modifying. If not found, ask user.
 ```
 This ensures future agents see the schema requirement even if they don't parse frontmatter.
 
@@ -1391,7 +2058,7 @@ ${feature-name}/
 ❌ CRITICAL: You MUST do this
 ❌ IMPORTANT: Do not skip this step
 ❌ **NOTE:** This is essential
-❌ ⚠️ WARNING: Required action
+❌ WARNING: Required action
 ❌ !!! ATTENTION !!!
 ❌ [REQUIRED] Step description
 ❌ Step description (MUST DO)
