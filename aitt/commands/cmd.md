@@ -1,6 +1,6 @@
 ---
 name: cmd
-description: Create, rewrite, or extend slash commands following the schema
+description: Create, rewrite, or modify slash commands following the schema
 category: orchestration
 version: 1.3
 schema: aitt/commands/cmd.md
@@ -15,7 +15,7 @@ input:
 
 # Cmd
 
-> Create, rewrite, or extend slash commands following the embedded schema specification.
+> Create, rewrite, or modify slash commands following the embedded schema specification.
 
 ## Purpose
 
@@ -23,12 +23,12 @@ This command serves as both the authoritative schema definition and an operation
 
 - **Create** new commands from scratch with proper structure
 - **Rewrite** existing non-compliant commands to follow the schema
-- **Extend** schema-compliant commands with additional functionality
+- **Modify** schema-compliant commands—extend or change their behavior
 
 **Use when:**
 - Starting a new slash command
 - Migrating legacy commands to schema compliance
-- Adding features to existing commands while maintaining structure
+- Extending or altering existing commands while maintaining structure
 
 **Do not use when:**
 - Making minor content edits (use direct file editing)
@@ -68,17 +68,17 @@ Transforms an existing non-compliant command to follow the schema. Creates a `.b
 /cmd rewrite .claude/commands/worktree.md
 ```
 
-### Mode C: Extend (with input)
+### Mode C: Modify (with input)
 
 ```
-/cmd extend <path-to-command>
+/cmd modify <path-to-command>
 ```
 
-Adds functionality to an existing schema-compliant command. Can modify any section or add new optional sections.
+Works on an existing schema-compliant command—either extending its functionality or modifying its current behavior. Can alter any section, add new sections, or change existing logic.
 
 **Example:**
 ```
-/cmd extend .claude/commands/deploy.md
+/cmd modify .claude/commands/deploy.md
 ```
 
 ### Mode D: Interactive (no input)
@@ -93,7 +93,7 @@ Prompts for mode selection when invoked without arguments.
 
 ### Gate 1: Valid Mode Detection
 
-**Check:** Input matches one of: `create <name>`, `rewrite <path>`, `extend <path>`, or empty
+**Check:** Input matches one of: `create <name>`, `rewrite <path>`, `modify <path>`, or empty
 **Pass:** Proceed to mode-specific gate
 **Fail:** Exit with usage guidance
 
@@ -102,13 +102,13 @@ Prompts for mode selection when invoked without arguments.
 Invalid input. Usage:
   /cmd create <command-name>
   /cmd rewrite <path-to-command>
-  /cmd extend <path-to-command>
+  /cmd modify <path-to-command>
   /cmd                         (interactive mode)
 ```
 
 ---
 
-### Gate 2: Target Validation (rewrite/extend modes)
+### Gate 2: Target Validation (rewrite/modify modes)
 
 **Check:** Target file exists at specified path
 **Pass:** Proceed to Process
@@ -122,7 +122,7 @@ Verify the file path and try again.
 
 ---
 
-### Gate 3: Schema Compliance (extend mode only)
+### Gate 3: Schema Compliance (modify mode only)
 
 **Check:** Target command follows schema structure (has frontmatter, required sections)
 **Pass:** Proceed to Process
@@ -144,7 +144,62 @@ Extract mode and target from `$ARGUMENTS`:
 Input: ""                    → Mode: interactive
 Input: "create foo"          → Mode: create, Target: foo
 Input: "rewrite path/cmd.md" → Mode: rewrite, Target: path/cmd.md
-Input: "extend path/cmd.md"  → Mode: extend, Target: path/cmd.md
+Input: "modify path/cmd.md"  → Mode: modify, Target: path/cmd.md
+```
+
+---
+
+### Step 1.5: Gap Analysis and User Clarification
+
+Throughout all modes, when encountering ambiguity or gaps that cannot be resolved through logical inference:
+
+**When to ask:**
+- Architectural decisions with multiple valid approaches
+- Business logic that requires domain knowledge
+- Naming conventions specific to the user's project
+- Integration points with unknown external systems
+- Priority conflicts between competing requirements
+
+**When NOT to ask:**
+- Formatting choices covered by this schema
+- Standard patterns with clear best practices
+- Technical implementation details derivable from context
+- Syntax or structure questions answerable from existing code
+
+**Question Protocol:**
+
+1. Ask **one question at a time**
+2. Provide **alphabetically labeled options** (A, B, C, etc.)
+3. **Option A is always the recommended choice**
+4. Include brief rationale for each option
+5. Always include a final option for "Other (specify)"
+
+**Question Format:**
+```
+[Context: Brief explanation of why this decision matters]
+
+<question>
+A) Recommended option - [why this is preferred]
+B) Alternative option - [tradeoff/benefit]
+C) Alternative option - [tradeoff/benefit]
+Z) Other (please specify)
+</question>
+
+Awaiting your selection before proceeding.
+```
+
+**Example:**
+```
+The command's error handling strategy affects recovery behavior.
+
+<question>
+A) Fail-fast (recommended) - Exit immediately on first error; simpler, predictable, easier to debug
+B) Accumulate - Collect all errors, report at end; better for batch operations but delays feedback
+C) Retry with backoff - Attempt recovery; handles transient failures but adds complexity
+Z) Other (please specify)
+</question>
+
+Awaiting your selection before proceeding.
 ```
 
 ---
@@ -285,23 +340,23 @@ Upon approval, write schema-compliant version to target path.
 
 ---
 
-#### Mode: Extend
+#### Mode: Modify
 
 ##### Step 2.1: Read Existing Command
 
 Read schema-compliant target file.
 
-##### Step 2.2: Gather Extension Requirements
+##### Step 2.2: Gather Modification Requirements
 
 Prompt user for:
-- Which section(s) to modify
-- What functionality to add
+- Which section(s) to modify or extend
+- What changes to make (add, alter, or remove functionality)
 - Any new sections needed
 
 ##### Step 2.3: Generate Modifications
 
-Create additions while:
-- Preserving existing structure
+Apply changes while:
+- Preserving existing structure where not explicitly changed
 - Maintaining schema compliance
 - Following section-specific formatting
 
@@ -311,7 +366,7 @@ Show proposed changes. Request user approval.
 
 ##### Step 2.5: Update File
 
-Upon approval, write extended version to target path.
+Upon approval, write modified version to target path.
 
 ---
 
@@ -324,7 +379,7 @@ Schema Command - Select Mode:
 
 1. create  - Generate new command from scratch
 2. rewrite - Transform existing command to schema
-3. extend  - Add functionality to compliant command
+3. modify  - Extend or change behavior of compliant command
 
 Enter mode and target (e.g., 'create my-command'):
 ```
@@ -371,9 +426,9 @@ Output summary:
 <target>                      # Transformed command
 ```
 
-**Extend mode:**
+**Modify mode:**
 ```
-<target>                      # Extended command
+<target>                      # Modified command
 ```
 
 ### Success Output
@@ -381,9 +436,9 @@ Output summary:
 ```
 Schema command completed successfully.
 
-Mode: <create|rewrite|extend>
+Mode: <create|rewrite|modify>
 Target: <path>
-Status: <created|rewritten|extended>
+Status: <created|rewritten|modified>
 
 [Backup: <path>.bak]          # Rewrite mode only
 ```
@@ -439,7 +494,7 @@ Status: <created|rewritten|extended>
 **Cause:** Unrecognized mode keyword
 
 **Resolution:**
-1. Check spelling of mode (create, rewrite, extend)
+1. Check spelling of mode (create, rewrite, modify)
 2. Ensure proper spacing between mode and target
 3. Retry with correct syntax
 
@@ -458,14 +513,14 @@ Status: <created|rewritten|extended>
 
 ---
 
-### ERR-003: Non-Compliant Target (extend mode)
+### ERR-003: Non-Compliant Target (modify mode)
 
 **Symptoms:** Command fails at Gate 3
 **Cause:** Target doesn't follow schema structure
 
 **Resolution:**
 1. Use rewrite mode first: `/cmd rewrite <target>`
-2. Then use extend mode on the rewritten command
+2. Then use modify mode on the rewritten command
 
 ---
 
@@ -484,7 +539,7 @@ Status: <created|rewritten|extended>
 
 ### ERR-005: User Rejected Changes
 
-**Symptoms:** Transformation/extension abandoned
+**Symptoms:** Transformation/modification abandoned
 **Cause:** User declined approval
 
 **Resolution:**
@@ -588,16 +643,16 @@ Rewritten: .claude/commands/worktree.md
 
 ---
 
-### Example 3: Extend Existing Command
+### Example 3: Modify Existing Command
 
 **Input:**
 ```
-/cmd extend .claude/commands/deploy-staging.md
+/cmd modify .claude/commands/deploy-staging.md
 ```
 
 **Interaction:**
 ```
-Extending: .claude/commands/deploy-staging.md
+Modifying: .claude/commands/deploy-staging.md
 
 Current sections:
 1. Purpose
@@ -606,10 +661,10 @@ Current sections:
 4. Outputs
 5. Error Handling
 
-What would you like to add/modify?
+What would you like to change?
 > Add rollback capability to Process section
 
-Generating extension...
+Generating modifications...
 
 [Proposed changes presented]
 
@@ -621,12 +676,12 @@ If health check fails:
 3. Verify rollback successful
 4. Report failure with rollback status
 
-Apply extension? [Y/n]
+Apply changes? [Y/n]
 ```
 
 **Result:**
 ```
-Extended: .claude/commands/deploy-staging.md
+Modified: .claude/commands/deploy-staging.md
 ```
 
 ---
@@ -644,7 +699,7 @@ Schema Command - Select Mode:
 
 1. create  - Generate new command from scratch
 2. rewrite - Transform existing command to schema
-3. extend  - Add functionality to compliant command
+3. modify  - Extend or change behavior of compliant command
 
 Enter mode and target: create api-test
 ```
@@ -710,7 +765,8 @@ input:
 | 9 | Validation | If applicable | Post-execution checks with fix procedures |
 | 10 | Cleanup | If applicable | Resource cleanup after execution |
 | 11 | Error Handling | Recommended | Failure modes and recovery |
-| 12 | References | If applicable | Related commands, external docs |
+| 12 | Summary | Recommended | Post-execution summary and reflection |
+| 13 | References | If applicable | Related commands, external docs |
 
 ---
 
@@ -895,6 +951,10 @@ Description or schema of output structure.
 |-------|-------|------------|
 | `Target not found` | Invalid input | Verify target exists |
 | `Missing dependency` | Prerequisite not met | Run `/prerequisite` first |
+
+## Summary
+
+Brief post-execution summary of what was accomplished, issues encountered (if any), and recommended next steps.
 
 ## References
 
@@ -1673,7 +1733,95 @@ Document failure modes and recovery. Use the appropriate format based on complex
 
 ---
 
-### 12. References
+### 12. Summary
+
+Post-execution summary providing reflection on what was accomplished, issues encountered, and recommended next steps. This section helps users understand the outcome and determine follow-up actions.
+
+**When to include:**
+- Complex multi-step processes where outcomes may vary
+- Analysis commands that produce findings requiring interpretation
+- Workflows that may encounter recoverable issues
+- Any command where user action may be needed post-execution
+
+**When to omit:**
+- Simple commands with obvious success/failure outcomes
+- Commands where the output artifacts speak for themselves
+
+```markdown
+## Summary
+
+Brief post-execution summary addressing:
+- What was successfully accomplished
+- Issues encountered (if any) with their impact
+- Data quality or completeness assessment (if applicable)
+- Recommended next steps or follow-up actions
+- Any caveats or limitations users should be aware of
+
+### Format A: Success with No Issues
+
+If everything completed successfully with no gaps or concerns:
+
+```
+✓ [COMMAND NAME] COMPLETE
+
+[1-2 sentence summary of what was accomplished]
+No issues detected. All objectives met.
+```
+
+### Format B: Success with Notes
+
+If command completed but with recoverable issues, missing data, or important context:
+
+```
+✓ [COMMAND NAME] COMPLETE
+
+[1-2 sentence summary of what was accomplished]
+
+Issues Encountered:
+- [Issue 1 description]
+- [Issue 2 description]
+
+Impact:
+[How issues affect the output or next steps]
+
+Recommended Actions:
+1. [Specific action to address issue 1]
+2. [Specific action to address issue 2]
+
+Quality Assessment: [Brief statement on output completeness/reliability]
+```
+
+### Format C: Partial Completion
+
+If command completed but some objectives were not met:
+
+```
+⚠ [COMMAND NAME] PARTIALLY COMPLETE
+
+Completed:
+- [What succeeded]
+
+Incomplete:
+- [What failed or was skipped]
+
+Reason: [Why partial completion occurred]
+
+Next Steps:
+1. [How to complete remaining work]
+2. [Alternative approaches if applicable]
+```
+
+**Key principles:**
+- Be concise—users want actionable information, not verbose recap
+- Prioritize recommendations—what should the user do next?
+- Differentiate severity—minor gaps vs. critical issues
+- Provide specificity—concrete actions, not vague suggestions
+- Omit the section entirely if no useful information to convey
+```
+
+---
+
+### 13. References
 
 Link related resources.
 
@@ -2129,6 +2277,14 @@ To convert an existing command to this schema:
 ---
 
 ## Changelog
+
+### Version 1.4
+- Added Summary section (section 12) as recommended post-execution reflection
+- Summary provides outcome assessment, issues encountered, and next steps
+- Three format options: Success with No Issues, Success with Notes, Partial Completion
+- Renumbered References from section 12 to section 13
+- Updated Section Reference table and Complete Template
+- Summary is recommended but not mandatory—omit when no useful information to convey
 
 ### Version 1.3
 - Added "Writing Style" section to Best Practices
