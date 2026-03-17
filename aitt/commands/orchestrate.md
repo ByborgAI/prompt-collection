@@ -2,7 +2,7 @@
 name: orchestrate
 description: Implementation coordinator that drives plan execution via subagents
 category: orchestration
-version: 2.2
+version: 2.9
 schema: aitt/commands/cmd.md
 model: opus
 input:
@@ -17,107 +17,70 @@ input:
 
 > Implementation coordinator that fully implements a plan to production quality using subagents, with intelligent verification that adapts to project capabilities.
 
----
-
-**ABSOLUTE RULE: The orchestrator (you) CANNOT write code, debug, or verify. ONLY subagents can.**
-
-- Orchestrator: coordinates, plans, delegates, monitors results
-- Subagents: write ALL code, run ALL debugging, perform ALL verification
-
-This is non-negotiable. No exceptions. No "just this once."
-
----
-
 ## Purpose
 
-Fully implement the plan at the provided path to production quality **exclusively through subagents**. You are the conductor—subagents are the musicians. You coordinate, delegate, and verify; subagents do ALL implementation work.
+Fully implement the plan at the provided path **exclusively through subagents**. You are orchestrating the work of subagents.
 
-**CRITICAL RULE: You MUST NOT write implementation code directly.**
+**Your role:**
+- Read and analyze the plan
+- Decompose work into tasks and write task specifications
+- Launch subagents via the Task tool
+- Monitor progress and forward results between dependent subagents
+- Validate that implementation meets all original requirements
 
-Your role is strictly limited to:
-- Reading and analyzing the plan
-- Decomposing work into tasks
-- Writing task specifications for subagents
-- Launching subagents via the Task tool
-- Monitoring progress and coordinating handoffs
-- Reviewing subagent reports (NOT running commands yourself)
-- Synthesizing final reports
-- **Validating that implementation meets original requirements**
+**You are forbidden from:**
+- Using Edit/Write on source code files
+- Using Bash to run tests, linters, builds, or any verification commands
+- Implementing, debugging, or investigating errors directly
+- Any hands-on action, regardless of how trivial it seems
 
-**You are FORBIDDEN from:**
-- Using Edit/Write tools on source code files
-- Using Bash to run tests, linters, or any verification commands
-- Using Bash to debug or investigate errors directly
-- Implementing "just this one small thing" yourself
-- "Helping out" with implementation when subagents struggle
-- Running `pnpm test`, `pnpm lint`, `pnpm build`, etc. directly
-
-If you catch yourself reaching for Edit/Write on source files, or Bash to run tests/linters/builds—STOP. Delegate to a subagent instead.
+If you catch yourself reaching for Edit/Write or Bash—STOP and delegate to a subagent.
 
 **Use when:**
 - Implementing a multi-phase feature from a detailed plan
-- Coordinating parallel implementation work across multiple files/modules
-- Ensuring consistent quality gates and verification across implementation
+- Coordinating parallel implementation across multiple files/modules
 
 **Do not use when:**
-- Simple single-file changes
-- Quick bug fixes
+- Simple single-file changes or quick bug fixes
 - Exploratory research tasks
 
 ## Key Principles
 
-**Mandatory Delegation:**
-ALL implementation work MUST go through subagents. The orchestrator's job is to coordinate, not to code. Every line of implementation code should be written by a subagent launched via the Task tool.
+### Execution Model
 
-**Anti-Pattern to Avoid:**
-- **Wrong:** "This is just a small change, I'll do it myself to save time"
-- **Correct:** Create a task spec and launch a subagent, no matter how small the change
+**Implementer + Orchestrator Verification:**
+Each implementer subagent writes code and generates migration files (if schema changes are involved). The orchestrator then applies migrations via a dedicated subagent before launching a verification subagent to run CLI checks (unit tests, typecheck, lint). When a milestone has no schema changes, the implementer can self-verify inline. A dedicated final verifier is launched once after all milestones for comprehensive testing.
 
-**Adaptive Verification Strategy:**
-Verification should use the most efficient approach available. CLI-based testing (unit tests, API calls, scripts) is faster and more reliable than UI testing. Always start with CLI verification; only escalate to UI testing when CLI tests pass or when the feature requires visual/interaction verification.
-
-**Verification Hierarchy (most to least efficient):**
+**Adaptive Verification (most to least efficient):**
 1. Unit tests and automated test suites
 2. CLI/script execution (API endpoints, command-line tools)
-3. Browser-based testing via Chrome MCP
+3. Browser-based testing via Chrome Devtools MCP
 4. Full E2E testing via Playwright/Selenium
 
-**Subagent Reporting Protocol:**
-Every subagent MUST report what it implemented in a clear, functional summary. Reports should focus on:
-- **What was implemented** (functionality and concept)
-- **How it meets requirements** (mapping to acceptance criteria)
-- **Verification results** (what passed, what failed)
-- Code snippets ONLY when necessary for another agent to continue work
+**Migration-First Execution:**
+When a milestone involves database schema changes, migrations must be generated and applied *before* self-verification runs. Code that depends on new columns, tables, or relations cannot be tested against an outdated schema. Implementers include migration generation as part of their implementation work. The orchestrator ensures migrations are applied (via a subagent) before any verification step that depends on the new schema. When possible, break schema-dependent work into smaller increments: generate migration → apply → implement code → verify. This keeps the feedback loop tight and prevents the "build everything blind, hope it works" anti-pattern.
 
-**Anti-Pattern to Avoid (Reporting):**
-- **Wrong:** Dumping entire file contents or verbose code blocks
-- **Correct:** Summarize functionality, reference file:line for details
+**Complete Execution — No Deferral:**
+Every plan item MUST be fully implemented. If a task proves harder than expected, solve it—don't defer it. The final requirements validation treats any deferred or missing item as mandatory work.
 
-**Clean, Simple, Maintainable:**
-Prefer the smallest solution that meets the plan. No gold-plating.
+**Server Health Invariant:**
+A broken dev server is a broken feedback loop. If the dev server crashes, fails to start, or becomes unresponsive at any point during implementation — whether from a code change, a new endpoint, a missing dependency, a schema mismatch, or any other cause — the responsible subagent (or a dedicated recovery subagent) must diagnose and fix the issue before any further implementation work proceeds. Continuing to write code against an untestable system is forbidden. This applies to every phase: implementer self-verification, milestone transitions, and final verification. The orchestrator treats a non-running server as a blocking failure equivalent to failing tests — no milestone can advance while the server is down.
 
-**No Code Duplication:**
-Reuse existing primitives/components; factor shared logic into well-named utilities only when it removes real repetition in ≥2 places.
+### Communication
 
-**No Over-Engineering:**
-No speculative abstractions, frameworks, or "future-proofing" unless explicitly required by the plan.
+**Subagent Reporting:**
+Reports must be detailed enough that the orchestrator and subsequent subagents can continue work without re-reading the codebase. Include: functional summary, requirements addressed, all files changed with what changed in each, key type signatures and API contracts introduced, patterns and conventions chosen, and any decisions that affect downstream work. Don't dump entire file contents, but do include the specific signatures, interfaces, and contracts that other agents need to build on.
 
-**Consistency:**
-Match existing code style, patterns, naming, file structure, and error-handling conventions.
+**Inter-Subagent Communication:**
+The orchestrator reads each report, extracts what the next subagent needs, and includes it in the next task's `context_from_previous` field. The quality of this handoff depends entirely on report detail — a vague report forces the next agent to rediscover context, wasting tokens and risking inconsistency.
 
-**Anti-Pattern to Avoid (Code Quality):**
-- **Wrong:** Creating a generic utility "for future use" when only one call site exists
-- **Correct:** Write the specific code inline; extract only when duplication actually occurs
+### Code Standards
 
-**Requirements Traceability:**
-At completion, every original requirement must be demonstrably met. The orchestrator tracks requirements → implementation → verification as a chain. Nothing is "done" until verified against the original plan.
+**Simplicity:**
+Prefer the smallest solution that meets the plan. No code duplication, no speculative abstractions. Reuse existing primitives; match existing code style, patterns, and conventions.
 
 **Code Hygiene:**
-Before declaring completion, ensure the codebase is clean. Remove all dead code, unused exports, debug logs, temp scripts, and leftover functionality from experimentation. The final state should contain only what's necessary for the implemented feature—nothing more.
-
-**Anti-Pattern to Avoid (Code Hygiene):**
-- **Wrong:** Leaving `console.log` statements, commented-out code, or unused functions "just in case"
-- **Correct:** Remove everything not needed; version control preserves history if needed later
+Before declaring completion, the codebase must be clean: no dead code, unused exports, debug logs, temp scripts, or leftover experimental code. The final state contains only what's necessary.
 
 ## Inputs
 
@@ -142,78 +105,57 @@ The plan file should contain:
 
 ### Gate 1: Plan File Exists
 
-**Check:** Verify the provided path resolves to a readable markdown file
+**Check:** Provided path resolves to a readable markdown file
 **Pass:** Proceed to Gate 2
-**Fail:** Exit with error
+**Fail:** Exit — `Plan file not found: <path>. Verify the path and try again.`
 
-**Fail Output:**
-```
-Plan file not found: <path>
-Verify the path and try again.
-```
-
----
-
-### Gate 2: Plan File Contains Actionable Content
+### Gate 2: Plan Contains Actionable Content
 
 **Check:** Plan has identifiable tasks, phases, or checklist items
 **Pass:** Proceed to Process
-**Fail:** Exit with guidance
-
-**Fail Output:**
-```
-Plan file lacks actionable structure.
-Expected: phases, checklist items, or task breakdown.
-Review the plan and add implementation details.
-```
+**Fail:** Exit — `Plan file lacks actionable structure. Expected: phases, checklist items, or task breakdown.`
 
 ## Process
 
-### Step 1: Ingest & Decompose
+### Step 1: Analyze the Plan
 
-Read the plan file thoroughly and extract:
+Read the plan file and extract:
 
-1. **Requirements** - What must be built
-2. **Acceptance criteria** - How to verify success
-3. **Dependencies** - What must exist before implementation
-4. **Risks** - What could go wrong
-5. **Work breakdown** - Epics → tasks
+1. **Requirements** — What must be built
+2. **Acceptance criteria** — How to verify success
+3. **Dependencies** — What must exist before implementation
+4. **Risks** — What could go wrong
+5. **Work breakdown** — Epics → tasks
 
 #### Project Capability Detection
 
-Before planning verification, detect available testing capabilities by checking:
+Detect available project capabilities for verification and cleanup:
 
-| Capability | Detection Method | Verification Approach |
-|------------|------------------|----------------------|
-| Unit tests | `package.json` scripts (test, jest, vitest, mocha) | Run test suite |
-| API endpoints | Route files, OpenAPI specs, server code | CLI calls via curl/httpie |
-| CLI scripts | `package.json` scripts, `scripts/` folder | Direct execution |
-| Playwright | `playwright.config.*`, `@playwright/test` dependency | Run E2E suite |
-| Selenium | `selenium-webdriver` dependency, test configs | Run E2E suite |
-| Chrome MCP | MCP server availability | Browser-based verification |
+| Capability | Detection Method | Used In |
+|------------|------------------|---------|
+| Unit tests | `package.json` scripts (test, jest, vitest, mocha) | Milestone & final verification |
+| API endpoints | Route files, OpenAPI specs, server code | Milestone & final verification |
+| CLI scripts | `package.json` scripts, `scripts/` folder | Milestone & final verification |
+| Playwright | `playwright.config.*`, `@playwright/test` dependency | Final verification |
+| E2E Screenshots | `e2e/fixtures/screenshots.ts` or similar | Final verification |
+| Chrome Devtools MCP | MCP server availability | Final verification |
+| Dead code analyzer | `package.json` scripts/deps (knip, ts-prune, unimported) | Cleanup phase |
+| DB migrations | `package.json` scripts (db:migrate, db:push, db:generate), Drizzle/Prisma/Knex config, migration directories | Milestone execution — run before self-verification |
 
-**Detection Priority:**
-1. Check `package.json` for test scripts and testing dependencies
-2. Look for test configuration files (`jest.config.*`, `vitest.config.*`, `playwright.config.*`)
-3. Scan for test directories (`__tests__/`, `tests/`, `e2e/`, `spec/`)
-4. Check for API route definitions (enables CLI-based API testing)
-5. Verify MCP server availability for browser testing
+Detection priority: `package.json` scripts → test config files → test directories → E2E screenshot fixtures → API route definitions → MCP server availability → dead code analyzer → migration config/scripts.
 
 #### Unknowns Handling
 
-If critical information is missing:
-- Make reasonable assumptions
-- Document assumptions explicitly
-- Proceed without stalling
+If critical information is missing: make reasonable assumptions, document them, and proceed.
 
 #### Output Schema
 
 ```yaml
 plan_analysis:
-  requirements: [list of requirements]
-  acceptance_criteria: [list of criteria]
-  dependencies: [list of dependencies]
-  risks: [list of identified risks]
+  requirements: [list]
+  acceptance_criteria: [list]
+  dependencies: [list]
+  risks: [list]
   work_breakdown:
     - epic: "Epic Name"
       tasks:
@@ -221,100 +163,56 @@ plan_analysis:
           files: [affected files]
           depends_on: [task names]
   verification_capabilities:
-    unit_tests:
-      available: true/false
-      command: "pnpm test" | null
-      framework: "jest" | "vitest" | etc.
-    api_testing:
-      available: true/false
-      endpoints: [list of testable endpoints]
-    cli_scripts:
-      available: true/false
-      scripts: [list of available scripts]
-    e2e_testing:
-      available: true/false
-      framework: "playwright" | "selenium" | null
-      command: "pnpm test:e2e" | null
-    browser_testing:
-      available: true/false
-      method: "chrome_mcp" | null
+    unit_tests: { available: bool, command: string, framework: string }
+    api_testing: { available: bool, endpoints: [list] }
+    e2e_testing: { available: bool, framework: string, command: string, screenshots: { available: bool, env_var: string } }
+    browser_testing: { available: bool, method: string }
+    dead_code_analyzer: { available: bool, tool: string, command: string }
+    db_migrations: { available: bool, tool: string, generate_command: string, migrate_command: string, backup_command: string }
 ```
 
 ---
 
-### Step 2: Plan Execution & Verification Strategy
+### Step 2: Design Execution Strategy
 
-Produce a concise execution plan with:
+Using the analysis from Step 1, produce an execution plan:
 
-1. **Ordered milestones** - Sequential phases
-2. **Parallelizable task groups** - What can run concurrently
-3. **Definition of done** - Per milestone
-4. **Verification strategy** - Tailored to detected capabilities
+1. **Ordered milestones** — Sequential phases with clear boundaries
+2. **Parallelizable task groups** — Tasks within a milestone that can run concurrently (no file conflicts)
+3. **Definition of done** — Per milestone: what must be implemented and what self-verification must pass
+4. **Verification strategy** — Based on detected capabilities (see below)
+5. **Model selection** — Per task (see below)
 
-#### Verification Strategy Selection
+#### Verification Strategy
 
-Based on detected capabilities from Step 1, apply a **tiered verification strategy**:
+**Per milestone:**
+1. Implementers generate migration files (if schema changes involved) and write code
+2. Orchestrator applies migrations via a dedicated subagent before verification
+3. Verification subagent runs CLI checks (unit tests, typecheck, lint, API tests)
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│           VERIFICATION STRATEGY (TWO TIERS)                │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  MILESTONE VERIFICATION (after each milestone)             │
-│  ─────────────────────────────────────────────             │
-│  CLI-only, fast feedback:                                  │
-│     ├── Unit tests (pnpm test)                             │
-│     ├── Type checking (pnpm typecheck)                     │
-│     ├── Linting (pnpm lint)                                │
-│     └── API endpoint tests via curl/scripts                │
-│                                                             │
-│  FINAL VERIFICATION (once, after all milestones)           │
-│  ─────────────────────────────────────────────             │
-│  Full verification including UI:                           │
-│     ├── All CLI tests from milestone verification          │
-│     ├── E2E tests (Playwright/Selenium) if available       │
-│     ├── Browser testing via Chrome MCP                     │
-│     └── Full feature walkthrough                           │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+This ensures code is always verified against the actual database state — never against a stale schema.
 
-**Why This Approach:**
-- **Milestone verification** catches issues early with fast CLI feedback
-- **Final verification** ensures the complete feature works end-to-end
-- Avoids slow E2E runs after every small change
-- Browser testing is expensive—save it for when it matters most
+**Once after all milestones (dedicated final verifier):**
+Full verification — all CLI tests, runtime startup check, E2E tests, browser testing via Chrome Devtools MCP (if feature has UI).
 
-**Strategy Selection Rules:**
-- **After each milestone** → CLI tests only (unit, lint, typecheck, API curl)
-- **Final verification** → CLI tests + E2E + browser testing (if UI exists)
-- **Backend-only features** → Skip UI testing entirely
-- **API/service changes** → Skip UI testing (curl/scripts sufficient)
-- **Config/data changes** → Skip UI testing
-- **Frontend components** → Include UI testing in final verification
-- **Full-stack features with UI** → Include UI testing in final verification
-
-#### Task Assignment
-
-For each task, assign:
-- **IMPLEMENTER** subagent - Does the work
-- **VERIFIER** subagent - Validates the work using selected strategy
+**Skip UI verification for:** Backend/API-only changes, config/data changes, library/utility code.
 
 #### Model Selection
 
-| Task Type | Model | Justification |
-|-----------|-------|---------------|
-| Architecture decisions | Opus | Complex reasoning required |
-| Risky refactors | Opus | High-stakes changes |
-| New component scaffolding / complex task | Opus | Design decisions |
-| Straightforward implementation | Sonnet | Well-defined scope |
-| Test writing | Sonnet | Clear patterns |
-| Config changes | Sonnet | Low complexity |
-| Verification tasks | Sonnet | Pattern-based execution |
+| Task Type | Model |
+|-----------|-------|
+| Architecture decisions, risky refactors | Opus |
+| New component scaffolding, complex tasks | Opus |
+| Straightforward implementation, tests, config | Opus |
+| Verification tasks | Opus |
 
 ---
 
-### Step 3: Subagent Orchestration
+### Step 3: Define Task Templates
+
+Define the task specifications that will be filled in for each subagent during execution. Three templates are needed: implementers (used per-milestone in Step 5), a final verifier (used once in Step 7), and a requirements validator (used once in Step 8).
+
+Every subagent receives the plan file path so it has full context of the overall feature being built.
 
 #### Implementer Task Spec
 
@@ -322,232 +220,282 @@ For every implementer task, provide:
 
 ```yaml
 task_spec:
+  plan_file: "path/to/plan.md"  # Always include — gives subagent full feature context
   name: "Task name"
   scope: "What to implement"
   original_requirements:
     - "Requirement 1 this task addresses"
     - "Requirement 2 this task addresses"
   files_affected: [list of file paths]
+
+  # REQUIRED for dependent tasks — orchestrator populates from previous report
+  context_from_previous:
+    summary: "What was built before this task"
+    artifacts:
+      - type: "types" | "api" | "component" | "schema" | "config"
+        location: "path/to/file.ts"
+        details: "Key signatures or contracts"
+    decisions:
+      - "Decision made by previous agent and why"
+    raw_report: |
+      [Relevant excerpt from previous subagent's report]
+
+  discovery:
+    requirement: |
+      Before implementing new functionality, search the codebase for existing code to reuse or extend:
+      1. Search for existing functions, classes, utilities, and helpers that overlap with what you're about to build
+      2. Search for existing type definitions, interfaces, and constants that can be reused
+      3. Check shared packages and libraries for primitives that cover your use case
+      4. If a suitable existing implementation exists, extend or wrap it — do not create a parallel version
+      5. Document in your report what you found and whether you reused, extended, or had to build from scratch
+
   constraints:
     - "Follow existing code style"
     - "No new dependencies unless required"
     - "Match error handling patterns"
-  simplicity_guidance:
-    - "No code duplication"
-    - "No speculative abstractions"
-    - "Smallest solution that works"
+    - "No code duplication or speculative abstractions"
+    - "Search for and reuse existing definitions before creating new ones"
   required_tests: [list of test requirements]
   expected_outputs: [list of artifacts]
-  rollback_notes: "How to undo if needed"
 
-  # Reporting requirements for the subagent
-  reporting_requirements:
-    must_include:
-      - "Summary of what was implemented (functionality, not code)"
-      - "Which original requirements are now satisfied"
-      - "Files modified with brief description of changes"
-      - "Any new tests added"
-      - "Any assumptions made"
-    must_exclude:
-      - "Full file contents (reference file:line instead)"
-      - "Verbose code blocks (unless needed for next agent)"
-    format: |
-      ## Implementation Report: [Task Name]
+  # Database migration handling — include only when task involves schema changes.
+  # Implementers generate migration files as part of their work.
+  # The orchestrator applies migrations via a separate subagent before self-verification.
+  migration:
+    has_schema_changes: true/false
+    migration_steps:
+      - "Generate migration files (e.g., pnpm social:db:generate)"
+      - "Migration files to be applied by orchestrator before verification"
+    note: |
+      If your task modifies database schema (new tables, columns, relations, indexes):
+      1. Update the schema file as part of your implementation
+      2. Generate migration files using the project's migration tool
+      3. Report the migration files in your handoff notes
+      4. Do NOT apply migrations yourself — the orchestrator handles this
+      Self-verification will run AFTER the orchestrator applies your migrations.
 
-      ### What Was Implemented
-      [Functional description - what the user can now do]
+  # Self-verification: implementer runs these AFTER migrations have been applied.
+  # Subagents inherit CLAUDE.md — they know the project's test/lint/typecheck commands.
+  self_verification:
+    checks: [unit tests, typecheck, lint]
+    api_tests: [endpoints to curl, if applicable]
+    requirement: "All checks must pass. Fix issues and re-run until green."
+    precondition: "Migrations (if any) must be applied before running these checks."
+    server_health: |
+      After your changes, if the dev server is running (or needs to be running for verification):
+      1. Verify the dev server starts and stays running without crashes
+      2. If it crashes or fails to start — diagnose the root cause, fix it, and confirm it runs
+      3. Do NOT report completion while the server is in a broken state
+      4. If your changes introduced a new endpoint or modified routing, verify the server
+         accepts the new routes without errors
+      This is a blocking requirement — a broken server means your task is not done.
 
-      ### Requirements Addressed
-      - ✓ Requirement 1: [how it's satisfied]
-      - ✓ Requirement 2: [how it's satisfied]
+  report_format: |
+    ## Implementation Report: [Task Name]
 
-      ### Changes Made
-      - `path/to/file.ts`: [brief description]
-      - `path/to/test.ts`: Added tests for [what]
+    ### Discovery Results
+    [What existing code was found and reused/extended. What had to be built from scratch and why.]
 
-      ### Verification Notes
-      [Any manual verification performed, CLI tests run]
+    ### What Was Implemented
+    [Functional description — what the user can now do]
 
-      ### Handoff Notes (if applicable)
-      [Only include code snippets if next agent needs them]
+    ### Requirements Addressed
+    - ✓ Requirement 1: [how it's satisfied]
+
+    ### Changes Made
+    - `path/to/file.ts`: [what changed and why]
+    - `path/to/other.ts`: [what changed and why]
+
+    ### Key Artifacts Introduced
+    [Type signatures, interfaces, function signatures, API contracts,
+     data structures, or configuration that other code depends on.
+     Include the actual signatures — not just "added types to file.ts"
+     but the signatures themselves so downstream agents can use them.]
+
+    ### Migrations Generated (if applicable)
+    - `path/to/migration-file.sql`: [what it does]
+    - Migration must be applied before verification can run
+
+    ### Self-Verification Results
+    - Migrations applied: yes/no/not-needed
+    - Unit tests: pass/fail
+    - Typecheck: pass/fail
+    - Lint: pass/fail
+    - Server health: confirmed-running/not-applicable
+    - [Issues fixed during verification, if any]
+
+    ### Handoff Notes
+    [REQUIRED for downstream tasks. Summarize:
+     - What was built and where (file paths + purpose)
+     - Key signatures and contracts the next agent needs to use or extend
+     - Patterns and conventions established (naming, error handling, etc.)
+     - Decisions made and their rationale
+     - Anything the next agent should know to avoid breaking this work
+     The orchestrator extracts this section and passes it to
+     dependent subagents via context_from_previous.]
 ```
 
-#### Verifier Task Spec
+#### Final Verifier Spec
 
-There are **two types of verifier tasks**—use the appropriate spec:
-
-##### Milestone Verifier Spec (CLI-only, after each milestone)
-
-```yaml
-milestone_verifier_spec:
-  name: "Milestone Verification: [Milestone Name]"
-  type: "milestone"  # CLI-only verification
-  original_requirements:
-    - "Requirements addressed in this milestone"
-
-  cli_verification:
-    unit_tests:
-      command: "pnpm test"
-      expected: "all tests pass"
-    typecheck:
-      command: "pnpm typecheck"
-      expected: "no errors"
-    lint:
-      command: "pnpm lint"
-      expected: "no errors"
-    api_tests:  # If applicable
-      endpoints:
-        - method: "GET/POST/etc"
-          url: "/api/endpoint"
-          expected_status: 200
-      command: "curl commands or test script"
-
-  failure_criteria:
-    - "Any CLI test fails"
-    - "Type errors present"
-    - "Lint errors present"
-
-  reporting_requirements:
-    format: "brief_summary"
-    include:
-      - "CLI test results (pass/fail)"
-      - "Issues found with file:line references"
-    exclude:
-      - "Full code dumps"
-      - "UI testing results (not applicable)"
-```
-
-##### Final Verifier Spec (Full verification, once after all milestones)
+Used once in Step 7, after all milestones and code cleanup:
 
 ```yaml
 final_verifier_spec:
+  plan_file: "path/to/plan.md"  # Always include — gives subagent full feature context
   name: "Final Verification: [Feature Name]"
-  type: "final"  # Full verification including UI
-  original_requirements:
-    - "ALL requirements from plan"
+  original_requirements: [ALL requirements from plan]
 
+  # Subagents inherit CLAUDE.md — they know the project's specific commands.
+  # Specify WHAT to verify, not HOW (no hardcoded commands).
   cli_verification:
-    unit_tests:
-      command: "pnpm test"
-      expected: "all tests pass"
-    typecheck:
-      command: "pnpm typecheck"
-      expected: "no errors"
-    lint:
-      command: "pnpm lint"
-      expected: "no errors"
-    api_tests:
-      endpoints: [all relevant endpoints]
-      command: "curl commands or test script"
+    checks: [unit tests, typecheck, lint]
+    api_tests: [endpoints with expected status codes]
+
+  runtime_verification:
+    startup: "Start the dev server, verify no crashes within 30s"
+    smoke_test:
+      - "Key pages load without 500s or white screens"
+      - "API endpoints return expected response shapes"
+      - "No module resolution errors at runtime"
+    shutdown: "Stop the dev server after verification"
 
   ui_verification:  # Only if feature has UI components
     required: true/false
-    skip_reason: "backend-only" | "api-only" | null
-    method: "playwright" | "selenium" | "chrome_mcp"
+    skip_reason: "backend-only" | null
     e2e_tests:
-      command: "pnpm test:e2e" | null
+      screenshots:
+        enabled: true/false
+        review_action: "Read screenshots with AI to verify visual appearance"
     browser_testing:
-      startup: "pnpm dev"
       url: "http://localhost:PORT/path"
-      test_scenarios:
-        - "Happy path: Full feature walkthrough"
-        - "Edge case: [description]"
-        - "Error state: [description]"
-      use_chrome_mcp: true/false
+      scenarios:
+        - "Happy path walkthrough"
+        - "Edge cases"
+        - "Error states"
 
-  failure_criteria:
-    - "CLI tests fail → STOP, fix first"
-    - "E2E tests fail"
-    - "Browser testing finds issues"
-    - "Requirements not fully met"
+  failure_handling: "Fix issues and re-verify. CLI must pass before runtime. Runtime must pass before UI."
 
-  reporting_requirements:
-    format: "comprehensive_summary"
-    include:
-      - "All CLI test results"
-      - "UI test results (if applicable)"
-      - "Which requirements are satisfied"
-      - "Any issues found with file:line references"
-    exclude:
-      - "Full code dumps"
-      - "Verbose logs unless debugging"
+  report_format: |
+    ## Final Verification Report
+
+    ### CLI Results
+    [pass/fail for each check]
+
+    ### Runtime Results
+    [Startup status, smoke test results]
+
+    ### UI Results (if applicable)
+    [E2E results, screenshot review, browser testing]
+
+    ### Requirements Verified
+    - ✓ Requirement 1: [verification method]
+
+    ### Issues Found and Fixed
+    [Any problems resolved during verification]
 ```
 
-**Verification Flow:**
+#### Requirements Validator Spec
 
-1. **After each milestone** → Launch milestone verifier (CLI-only)
-   - Run unit tests, typecheck, lint
-   - Test API endpoints if applicable
-   - Fix issues, re-run until pass
-   - **No UI testing at this stage**
+Used once in Step 8, after final verification passes:
 
-2. **After ALL milestones complete** → Code cleanup first
-   - Remove dead code, debug artifacts, temp files
-   - Update documentation if needed
-   - **Cleanup before verification catches breakage**
+```yaml
+requirements_validator_spec:
+  plan_file: "path/to/plan.md"  # Always include — validator reads the plan to extract all requirements
+  name: "Requirements Validation: [Feature Name]"
+  final_verifier_report: |
+    [Full report from the final verifier subagent]
+  implementer_reports: |
+    [Summary of all implementer reports — what was built, where, how verified]
 
-3. **After cleanup** → Launch final verifier
-   - Run all CLI tests (comprehensive)
-   - Run E2E tests if available and applicable
-   - Browser testing via Chrome MCP if UI exists
-   - Full feature walkthrough
-   - Fix issues, re-run until pass
+  task: |
+    Read the plan file and extract every requirement and acceptance criterion.
+    For each one, determine whether it is fully satisfied by searching the codebase
+    for implementation evidence and cross-referencing with the verification reports.
 
-4. **When to skip UI verification:**
-   - Backend/API-only changes
-   - Config or data changes
-   - Library/utility code
-   - No user-facing changes
+  checks:
+    - "Every requirement from the plan is mapped to implementation evidence (file:line)"
+    - "Every acceptance criterion has a corresponding verification result"
+    - "No requirement is marked as deferred, partial, or known limitation"
+    - "No requirement was silently dropped or overlooked"
+
+  report_format: |
+    ## Requirements Validation Report
+
+    ### Requirements Traceability
+    - ✓ Requirement 1: implemented in `path/file.ts:line`, verified by [method]
+    - ✓ Requirement 2: implemented in `path/file.ts:line`, verified by [method]
+    - ✗ Requirement 3: NOT satisfied — [what's missing]
+
+    ### Acceptance Criteria
+    - ✓ Criterion 1: [evidence]
+    - ✓ Criterion 2: [evidence]
+
+    ### Gaps Found
+    [List of any requirements not fully satisfied, with details on what's missing]
+
+    ### Verdict
+    ALL SATISFIED | GAPS FOUND (list count)
+```
 
 ---
 
-### Step 4: Checkpoint — Execution Plan Ready
+### Step 4: Checkpoint — Ready to Execute
 
 > **GATE:** Do not proceed until satisfied.
 
-- [ ] All tasks assigned to implementer + verifier
+- [ ] All tasks assigned with implementer specs
 - [ ] Dependencies between tasks identified
 - [ ] Parallel groups identified
-- [ ] Model selection justified for each task
+- [ ] Model selection justified
+- [ ] Self-verification checks specified per implementer (what to verify, not specific commands)
 
 **If not satisfied:** Return to Step 2
 
 ---
 
-### Step 5: Execute Implementation
+### Step 5: Execute Milestones
 
-Launch subagents **using the Task tool** according to the execution plan.
+For each milestone in order, execute the implementation and verify results before moving on.
 
-**REMINDER: You MUST use the Task tool for ALL implementation.**
+#### Per Milestone
 
-#### How to Launch Subagents
+1. **Prepare task specs** — Fill in the implementer template from Step 3 with task-specific details
+2. **Launch implementer subagents** — Via the Task tool, with parallel launches where no file conflicts exist. Implementers write code AND generate migration files (if schema changes are involved), but do NOT apply migrations or run self-verification yet.
+3. **Forward results** — When a subagent completes and the next depends on it:
+   - Read the completed subagent's Handoff Notes
+   - Populate `context_from_previous` in the next task spec
+   - Launch the dependent subagent with full context
+4. **Apply migrations** — If any implementer in this milestone generated migration files:
+   - Launch a migration subagent to back up the database and run all pending migrations
+   - Wait for confirmation that migrations applied successfully
+   - If migration fails → launch a fix subagent to resolve schema issues, then re-apply
+5. **Run self-verification** — Launch a verification subagent to run CLI checks (unit tests, typecheck, lint) against the now-migrated database. This subagent also fixes any issues it finds.
+6. **Verify server health** — If the dev server should be running (or needs to run for this milestone's verification), confirm it starts and stays running. If it crashes or fails to start after the milestone's changes, launch a recovery subagent to diagnose and fix the issue before advancing. No milestone transition is allowed while the server is broken.
+7. **If pass** → Proceed to next milestone
+8. **If fail** → Launch a fix subagent to resolve issues and re-verify
 
-Use the Task tool with `subagent_type: "general-purpose"` for implementation:
+#### Migration Timing
+
+The default flow above batches migrations per milestone. For milestones with multiple schema-dependent tasks, use a tighter loop:
 
 ```
-Task tool call:
-  subagent_type: "general-purpose"
-  description: "Implement [task name]"
-  prompt: |
-    [Full task spec from Step 3]
-
-    Implementation requirements:
-    - Files to modify: [list]
-    - Expected behavior: [description]
-    - Tests to add/update: [list]
-
-    When complete, run verification commands and report results.
+Task A (schema change) → generate migration → apply migration → Task B (depends on A's schema) → generate migration → apply migration → verify all
 ```
+
+Choose the granularity based on task dependencies:
+- **Batch per milestone** — When tasks in the milestone don't depend on each other's schema changes
+- **Incremental (per task)** — When a later task depends on an earlier task's schema changes to write correct code. Apply migrations between tasks so the next implementer can read the actual database schema and write verified code against it.
 
 #### Coordination Rules
 
-1. **Parallel work** - Launch concurrent Task calls when no file conflicts
-2. **Sequential work** - Wait for Task completion before launching dependent tasks
-3. **File ownership** - Never launch parallel Tasks that edit same files
-4. **Status updates** - Track: current milestone, in-progress, blocked, next
-5. **No shortcuts** - Even "trivial" fixes must go through Task tool
+1. **Parallel work** — Launch concurrent tasks when no file conflicts
+2. **Sequential work** — Wait for completion before launching dependent tasks
+3. **File ownership** — Never launch parallel tasks that edit the same files
+4. **Status tracking** — Track: current milestone, in-progress, blocked, next
+5. **No shortcuts** — Even trivial fixes go through the Task tool
+6. **Server health is non-negotiable** — If at any point the dev server crashes, fails to start, or becomes unresponsive (due to code changes, new endpoints, dependency issues, etc.), all implementation work stops until the server is restored. The subagent that broke it fixes it. If the cause is unclear, launch a dedicated recovery subagent. Never proceed with implementation against a broken, untestable system.
 
-#### Quality Gates (Non-Negotiable)
+#### Quality Gates (apply to all subagent work)
 
 **Functionality:**
 - Features work per plan + acceptance criteria
@@ -559,480 +507,108 @@ Task tool call:
 - No security vulnerabilities
 
 **Code Quality:**
-- No copy/paste duplication
-- No unnecessary layers/patterns
-- Clear file responsibilities
-- Small, readable functions
-- No dead code or unused exports
-- No unused imports or variables
+- No copy/paste duplication, unnecessary layers, or dead code
+- No unused imports, variables, exports, or type definitions
 - No commented-out code blocks
+- Clear file responsibilities, small readable functions
 
 **Code Hygiene:**
-- No `console.log`, `console.debug`, or debug statements
-- No TODO/FIXME comments from this implementation (existing ones OK)
-- No temp scripts or files created during implementation
-- No leftover experimental code paths
-- No orphaned helper functions
-- No unused type definitions or interfaces
-
-**Testing & Tooling:**
-- All tests pass locally
-- Lint/format/typecheck pass
-- No noisy logs in production code
+- No `console.log`/`console.debug`/`debugger` (except intentional logging)
+- No TODO/FIXME from this implementation (existing ones OK)
+- No temp scripts, experimental code paths, or stub implementations
 
 **Documentation:**
-- README.md updated if new commands, scripts, or setup steps added
-- CLAUDE.md updated if new patterns, conventions, or AI-relevant context added
-- Keep updates brief—document what exists, not implementation details
+- README.md updated if new commands/scripts/setup steps added
+- CLAUDE.md updated if new patterns/conventions added
 
 ---
 
-### Step 6: Milestone Verification Loop
+### Step 6: Code Cleanup
 
-After **each milestone** (not after final):
+After all milestones pass, launch a cleanup subagent before final verification:
 
-1. Launch **milestone verifier** subagent with CLI-only spec
-2. Verifier performs CLI verification only:
-   - Unit tests (pnpm test)
-   - Type checking (pnpm typecheck)
-   - Linting (pnpm lint)
-   - API tests via curl/scripts (if applicable)
-3. If issues found:
-   - Verifier fixes directly (has Edit/Write access)
-   - Re-runs CLI tests
-   - Continues until pass
-4. If cannot fix → escalate to new implementer
+1. **Remove dead code** — If a dead code analyzer was detected (e.g. knip, ts-prune), run it first to get an authoritative list of unused exports, imports, variables, functions, and types. Otherwise, use grep/search to find them manually. Also remove commented code blocks.
+2. **Fix code duplication** — Scan all files changed during this implementation for duplicated logic, copy-pasted blocks, and near-identical patterns. Extract shared helpers, consolidate repeated code paths, and ensure no two places implement the same logic independently. Compare new code against pre-existing utilities and abstractions — if something already exists that covers the same concern, refactor to use it instead of keeping the duplicate.
+3. **Remove debug artifacts** — `console.log`/`debug`/`debugger` statements, TODO/FIXME from this implementation
+4. **Remove temp artifacts** — Temp files, scripts, one-time migration scripts
+5. **Remove leftover functionality** — Feature flags for testing, experimental code paths, stub implementations, dead conditional branches
+6. **Update documentation** — README.md if new scripts/commands; CLAUDE.md if new patterns
 
-**No UI testing at this stage.** Save it for final verification.
-
-**REMINDER:** ALL verification and fixing happens in subagents. Do NOT run tests yourself.
-
-#### Milestone Verification Flow
-
-```
-┌─────────────────┐
-│   Implement     │ (subagent)
-│   Milestone N   │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────┐
-│      MILESTONE VERIFICATION (CLI only)          │
-│  1. pnpm test → unit tests                      │
-│  2. pnpm typecheck → type checking              │
-│  3. pnpm lint → linting                         │
-│  4. curl/scripts → API tests (if applicable)    │
-└────────┬────────────────────────────────────────┘
-         │
-         ▼
-┌────────────────────┐
-│  All CLI Pass?     │
-└────────┬───────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌───────┐  ┌────────────────────────────────────┐
-│  Yes  │  │  No → Fix and re-run CLI tests     │
-│       │  └────────────────────────────────────┘
-│ PASS  │
-│       │
-│ → Next│
-│ Mile- │
-│ stone │
-└───────┘
-```
+Cleanup runs BEFORE final verification so any breakage from code removal is caught. Items that look dead but might be needed (public API, dynamic imports) should be preserved with justification.
 
 ---
 
-### Step 6b: Code Cleanup Verification
+### Step 7: Final Verification
 
-After all milestones complete and before final verification, run a cleanup sweep to eliminate cruft from the implementation process. **Cleanup happens first because removing code can break behavior**—we need the final verification to catch any issues.
+After cleanup, launch a dedicated final verifier subagent using the spec from Step 3.
 
-#### Cleanup Verifier Task Spec
+Verification order:
+1. **CLI tests** — All unit tests, typecheck, lint pass
+2. **Runtime check** (always) — Dev server starts, no crashes, key pages/endpoints respond, no 500s or module errors
+3. **UI verification** (only if feature has UI) — E2E tests, screenshots with AI review, Chrome MCP browser testing, full feature walkthrough
 
-```yaml
-cleanup_verifier_spec:
-  name: "Code Cleanup: [Feature Name]"
-  type: "cleanup"
-
-  files_to_scan:
-    - "All files modified/created during this implementation"
-    - "New test files"
-    - "Any temp files or scripts in project root/scripts/"
-
-  dead_code_detection:
-    unused_exports:
-      method: "Search for exports not imported elsewhere"
-      tools: "grep, AST analysis, IDE hints"
-    unused_imports:
-      method: "Lint errors or IDE warnings"
-      action: "Remove all unused imports"
-    unused_variables:
-      method: "Lint errors, underscore prefix check"
-      action: "Remove or properly ignore with underscore"
-    orphaned_functions:
-      method: "Search for functions never called"
-      action: "Remove if not part of public API"
-    commented_code:
-      method: "Search for multi-line commented blocks"
-      action: "Remove (git preserves history)"
-    unused_types:
-      method: "Search for types/interfaces not referenced"
-      action: "Remove if not part of public API"
-
-  debug_artifacts:
-    console_statements:
-      pattern: "console.log|console.debug|console.info|console.warn(?!.*production)"
-      exceptions: "Intentional logging in error handlers or logger utilities"
-      action: "Remove all debug logging"
-    debugger_statements:
-      pattern: "debugger;"
-      action: "Remove all"
-    todo_comments:
-      pattern: "TODO|FIXME|HACK|XXX"
-      check: "Are these from THIS implementation or pre-existing?"
-      action: "Remove if from this implementation; leave pre-existing"
-
-  temp_artifacts:
-    temp_files:
-      locations:
-        - "Project root (*.tmp, *.bak, *.log)"
-        - "scripts/ (temp-*.mjs, test-*.mjs)"
-        - ".claude/ or similar"
-      action: "Delete all temp files created during implementation"
-    temp_scripts:
-      pattern: "Files with 'temp', 'test', 'debug', 'scratch' in name"
-      check: "Created during this implementation?"
-      action: "Delete if created during this implementation"
-    migration_scripts:
-      check: "One-time scripts that have been run?"
-      action: "Delete or move to archive/ if needed for documentation"
-
-  leftover_functionality:
-    feature_flags:
-      check: "Any feature flags added for testing?"
-      action: "Remove if no longer needed, or document if intentional"
-    experimental_paths:
-      check: "Alternative implementations tried but abandoned?"
-      action: "Remove completely"
-    stub_implementations:
-      check: "Placeholder functions returning dummy data?"
-      action: "Either implement properly or remove"
-    disabled_code:
-      pattern: "if (false) or if (0) or similar"
-      action: "Remove dead branches"
-
-  documentation_updates:
-    readme_md:
-      check: "New scripts, commands, or setup steps added?"
-      action: "Add brief entry to relevant section (Scripts Reference, Quick Start, etc.)"
-    claude_md:
-      check: "New patterns, conventions, or AI-relevant guidelines?"
-      action: "Add brief entry to relevant section"
-    style: "Brief and factual—what it is, not how it works internally"
-
-  reporting_requirements:
-    format: |
-      ## Cleanup Report: [Feature Name]
-
-      ### Dead Code Removed
-      - `path/file.ts`: Removed unused function `helperXyz`
-      - `path/file.ts`: Removed unused import `SomeModule`
-
-      ### Debug Artifacts Removed
-      - `path/file.ts:42`: Removed console.log
-      - `path/file.ts:87`: Removed debugger statement
-
-      ### Temp Files Deleted
-      - `scripts/temp-migration.mjs`: Deleted (one-time script)
-      - `test-output.log`: Deleted
-
-      ### Leftover Functionality Removed
-      - `path/file.ts`: Removed experimental caching approach
-
-      ### Items Preserved (with justification)
-      - `path/file.ts:23`: Kept TODO comment (pre-existing)
-      - `utils/logger.ts`: Kept console.warn (intentional error logging)
-
-      ### Documentation Updated
-      - `README.md`: Added new script `pnpm xyz` to Scripts Reference
-      - `CLAUDE.md`: No updates needed (no new patterns)
-
-      ### Final State
-      - Total files cleaned: X
-      - Lines removed: ~Y
-```
-
-#### Cleanup Flow
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│              CODE CLEANUP VERIFICATION                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  1. DEAD CODE SCAN                                          │
-│     ├── Unused exports → Remove                             │
-│     ├── Unused imports → Remove                             │
-│     ├── Unused variables → Remove                           │
-│     ├── Orphaned functions → Remove                         │
-│     ├── Commented code blocks → Remove                      │
-│     └── Unused types/interfaces → Remove                    │
-│                                                             │
-│  2. DEBUG ARTIFACTS SCAN                                    │
-│     ├── console.log/debug → Remove                          │
-│     ├── debugger statements → Remove                        │
-│     └── New TODO/FIXME comments → Remove                    │
-│                                                             │
-│  3. TEMP ARTIFACTS SCAN                                     │
-│     ├── Temp files (*.tmp, *.bak, *.log) → Delete           │
-│     ├── Temp scripts (temp-*, debug-*) → Delete             │
-│     └── One-time migration scripts → Delete/Archive         │
-│                                                             │
-│  4. LEFTOVER FUNCTIONALITY SCAN                             │
-│     ├── Test feature flags → Remove                         │
-│     ├── Experimental code paths → Remove                    │
-│     ├── Stub implementations → Complete or Remove           │
-│     └── Dead conditional branches → Remove                  │
-│                                                             │
-│  5. DOCUMENTATION CHECK                                     │
-│     ├── README.md → Update if new scripts/commands          │
-│     └── CLAUDE.md → Update if new patterns/conventions      │
-│                                                             │
-│  → Cleanup complete, proceed to Final Verification          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-#### Important Notes
-
-1. **Cleanup runs BEFORE final verification** - This ensures any issues caused by code removal are caught
-2. **Preserve intentional patterns** - Not all console.* is debug (logger utilities, error handlers)
-3. **Check git status** - Don't delete files tracked in git unless they're implementation artifacts
-4. **Document exceptions** - If something looks like cruft but needs to stay, document why
-5. **Keep docs brief** - README/CLAUDE.md updates should be one-liners; users can read source for details
+If issues found → fix and re-verify. Continue until the project runs AND all tests pass.
 
 ---
 
-### Step 7: Final Verification (After Cleanup)
+### Step 8: Requirements Validation
 
-After cleanup, run comprehensive final verification to catch any issues cleanup may have caused:
+Launch a dedicated requirements validator subagent using the spec from Step 3. Provide it with the plan file, all implementer reports, and the final verifier report.
 
-1. Launch **final verifier** subagent with full spec
-2. Verifier performs:
-   - **CLI verification** (all tests, lint, typecheck)
-   - **UI verification** (only if feature has UI components):
-     - E2E tests (Playwright/Selenium) if available
-     - Browser testing via Chrome MCP
-     - Full feature walkthrough
-3. If issues found → fix and re-verify
-4. Continue until all tests pass
+The validator independently reads the plan, extracts every requirement and acceptance criterion, and searches the codebase for implementation evidence. It produces a traceability report.
 
-#### Final Verification Flow
-
-```
-┌─────────────────────────────────────┐
-│  Cleanup Complete                   │
-└────────┬────────────────────────────┘
-         │
-         ▼
-┌─────────────────────────────────────────────────┐
-│        FINAL CLI VERIFICATION                   │
-│  1. pnpm test → all unit tests                  │
-│  2. pnpm typecheck                              │
-│  3. pnpm lint                                   │
-│  4. All API endpoint tests                      │
-└────────┬────────────────────────────────────────┘
-         │
-         ▼
-┌────────────────────┐
-│  CLI Pass?         │
-└────────┬───────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌───────┐  ┌────────────────────────────┐
-│  Yes  │  │  No → Fix first            │
-└───┬───┘  └────────────────────────────┘
-    │
-    ▼
-┌────────────────────────────────────────┐
-│  Feature has UI components?            │
-└────────┬───────────────────────────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌───────┐  ┌─────────────────────────────────────┐
-│  No   │  │  Yes                                │
-│       │  │  ┌───────────────────────────────┐  │
-│ DONE  │  │  │  UI VERIFICATION              │  │
-│       │  │  │  1. E2E (Playwright/Selenium) │  │
-└───────┘  │  │  2. Chrome MCP browser test   │  │
-           │  │  3. Full feature walkthrough  │  │
-           │  └───────────────┬───────────────┘  │
-           │                  │                  │
-           │             ┌────┴────┐             │
-           │             │  Pass?  │             │
-           │             └────┬────┘             │
-           │          Yes     │     No           │
-           │        ┌─────────┴─────────┐        │
-           │        ▼                   ▼        │
-           │      DONE         Fix and re-run   │
-           └─────────────────────────────────────┘
-```
+**If all requirements satisfied** → Proceed to Step 9.
+**If gaps found** → Create new implementer tasks for each gap, include context from prior work, launch subagents, re-run verification (Steps 5-7), then re-run validation until all requirements are met.
 
 ---
 
-### Step 7b: Final Requirements Validation
+### Step 9: Completion
 
-Before declaring completion, verify **every original requirement** is satisfied.
+When all acceptance criteria are met, requirements validation passes, and code is clean:
 
-#### Requirements Traceability Check
-
-```yaml
-requirements_validation:
-  original_requirements:
-    - requirement: "Requirement 1 from plan"
-      status: "satisfied" | "partially_satisfied" | "not_implemented"
-      evidence:
-        - "Implementation location (file:line)"
-        - "Verification method used"
-        - "Test that confirms it works"
-    - requirement: "Requirement 2 from plan"
-      status: "satisfied"
-      evidence: [...]
-
-  acceptance_criteria:
-    - criterion: "Acceptance criterion 1"
-      verified: true/false
-      verification_method: "unit_test" | "api_test" | "e2e_test" | "manual_browser"
-      evidence: "How it was verified"
-
-  gaps_identified:
-    - "Any requirement not fully met"
-    - "Any acceptance criterion not verified"
-```
-
-#### Validation Process
-
-1. **List all original requirements** from the plan
-2. **Map each requirement** to implementation evidence:
-   - Which files implement it
-   - Which tests verify it
-   - How it was validated (CLI vs UI)
-3. **Identify gaps** - any requirement not fully satisfied
-4. **If gaps exist:**
-   - Create new implementer task for missing functionality
-   - Re-run verification loop
-   - Repeat until all requirements satisfied
-5. **Only proceed to completion when ALL requirements are satisfied**
-
----
-
-### Step 8: Completion
-
-When all acceptance criteria are demonstrably met AND requirements validation passes AND code cleanup is complete:
-
-1. **Final verifier signs off** with:
-   - Summary of what changed
-   - How it was tested (exact commands + results)
-   - Requirements traceability matrix
-   - Code cleanup report (what was removed)
-   - Review notes on simplicity/duplication/maintainability
-   - Remaining risks/known limitations (if any)
-
+1. **Produce final report** (see Outputs)
 2. **Produce release checklist** for merge/deploy
 
 ## Outputs
-
-### Artifacts Produced
-
-```
-Implementation complete:
-├── All code changes per plan
-├── Updated/added tests
-├── Updated docs/config as needed
-├── Requirements traceability matrix
-└── Final verification report
-```
 
 ### Final Report Schema
 
 ```yaml
 completion_report:
-  summary: "Brief description of what was implemented"
+  summary: "What was implemented"
 
   requirements_traceability:
-    - requirement: "Original requirement 1"
+    - requirement: "Original requirement"
       status: "satisfied"
       implementation: "path/to/file.ts:line"
       verification: "unit_test" | "api_test" | "e2e" | "browser"
-    - requirement: "Original requirement 2"
-      status: "satisfied"
-      implementation: "path/to/file.ts:line"
-      verification: "unit_test"
 
   milestones_completed:
-    - name: "Milestone 1"
+    - name: "Milestone"
       tasks: [completed tasks]
-      verification:
-        cli_tests: "pass"
-        ui_tests: "pass" | "skipped (backend only)"
+      self_verification: "pass"
 
   testing:
-    cli_verification:
-      unit_tests: "pnpm test → pass"
-      api_tests: "curl endpoints → pass"
-      scripts: "pnpm script:name → pass"
-    ui_verification:
-      method: "playwright" | "chrome_mcp" | "skipped"
-      results: "all scenarios pass"
-
-  subagent_reports:
-    - agent: "Implementer 1"
-      summary: "Functional summary of what was implemented"
-    - agent: "Verifier 1"
-      summary: "What was verified, which requirements confirmed"
+    cli: { unit_tests: "pass", typecheck: "pass", lint: "pass" }
+    runtime: { startup: "pass", smoke_test: ["/ → 200", "/feature → 200"], errors: "none" }
+    ui: { method: "playwright" | "chrome_mcp" | "skipped", results: "pass", screenshots: [reviewed files] }
 
   code_cleanup:
-    dead_code_removed:
-      - "Unused function `xyz` from path/file.ts"
-      - "Unused imports from X files"
-    debug_artifacts_removed:
-      - "console.log statements: X removed"
-      - "debugger statements: Y removed"
-    temp_files_deleted:
-      - "scripts/temp-migration.mjs"
-      - "test-output.log"
-    leftover_functionality_removed:
-      - "Experimental caching approach"
-      - "Test feature flags"
-    preserved_with_justification:
-      - "path/file.ts:23: TODO comment (pre-existing)"
-    documentation_updated:
-      - "README.md: Added script to Scripts Reference"
-      - "CLAUDE.md: No updates needed"
+    dead_code_removed: [items]
+    debug_artifacts_removed: [items]
+    temp_files_deleted: [items]
+    documentation_updated: [items]
 
-  quality_notes:
-    simplicity: "Assessment of code simplicity"
-    duplication: "Any duplication concerns"
-    maintainability: "Maintainability assessment"
-    hygiene: "Code is clean, no debug artifacts or dead code"
-
-  risks_limitations:
-    - "Any known limitations"
+  quality_notes: { simplicity: "...", duplication: "...", maintainability: "..." }
+  risks_limitations: [any known limitations]
 
   release_checklist:
-    - [ ] All CLI tests pass
-    - [ ] All UI tests pass (if applicable)
-    - [ ] All requirements satisfied
-    - [ ] No TypeScript errors
-    - [ ] Code cleanup complete (no dead code, debug logs, temp files)
-    - [ ] Documentation updated (README.md, CLAUDE.md if needed)
-    - [ ] Code reviewed
-    - [ ] Ready for merge
+    - "All requirements met"
+    - "All tests passing"
+    - "Project runs (dev server + smoke tests)"
+    - "Code cleanup complete"
+    - "Documentation updated"
+    - "Ready for merge"
 ```
 
 ## Examples
@@ -1046,220 +622,126 @@ completion_report:
 ### Example Execution Flow
 
 ```
-1. Reading plan: docs/plans/feature-name.md
+1. Analyze plan: docs/plans/feature-name.md
+   → 3 phases, 12 tasks, 2 parallel groups
+   → Capabilities: vitest, playwright, Chrome MCP, knip
 
-2. Plan Analysis:
-   - 3 phases identified
-   - 12 tasks extracted
-   - 2 parallel groups possible
-   - Verification capabilities detected:
-     ├── Unit tests: available (vitest/jest)
-     ├── API endpoints: /api/resource/*
-     ├── E2E: playwright available
-     └── Chrome MCP: available
+2. Execution strategy:
+   → Per milestone: implementer self-verifies (CLI)
+   → Final: CLI + runtime + E2E + Chrome MCP
+   → Phase 1: Opus | Phase 2-3: Sonnet
 
-3. Verification Strategy:
-   - Milestone verification: CLI only (unit, lint, typecheck, API curl)
-   - Final verification: CLI + E2E + Chrome MCP (has UI components)
+3. Execute milestones:
+   Phase 1: Foundation
+     → Schema + migration generated
+     → DB backed up, migration applied ✓
+     → Types + repository implemented
+     → Self-verification pass ✓
+   Phase 2: Core logic
+     → New column migration generated → applied ✓
+     → Service + API implemented
+     → 1 test failure → fixed → pass ✓
+   Phase 3: Integration (no schema changes)
+     → UI wired to API → pass ✓
 
-4. Execution Plan:
-   Phase 1 (Foundation): 4 tasks → Opus
-   Phase 2 (Core Logic): 5 tasks → Sonnet, parallel where possible
-   Phase 3 (Integration): 3 tasks → Sonnet
+4. Code cleanup:
+   → knip: removed unused helper, 5 imports
+   → Removed 4 console.logs, 1 temp script
+   → Updated README.md
 
-5. Launching Phase 1 implementer...
-   [Implementer Report: Foundation complete, types defined]
+5. Final verification:
+   → CLI: all pass
+   → Runtime: server starts on :3010, smoke tests pass
+   → UI: E2E pass, screenshots reviewed, Chrome MCP walkthrough pass
 
-6. MILESTONE Verification Phase 1 (CLI only):
-   - pnpm test → pass
-   - pnpm typecheck → pass
-   - pnpm lint → pass
-   ✓ Phase 1 complete → proceed to next milestone
+6. Requirements validation: 3/3 satisfied
 
-7. Launching Phase 2 tasks (some in parallel)...
-   [Implementer Reports: Core logic implemented]
-
-8. MILESTONE Verification Phase 2 (CLI only):
-   - pnpm test → 1 failure → Fixed → pass
-   - curl /api/resource → 200 OK
-   - pnpm typecheck → pass
-   ✓ Phase 2 complete → proceed to next milestone
-
-[... continues through all phases with CLI-only verification ...]
-
-9. ALL MILESTONES COMPLETE → CODE CLEANUP:
-    Dead code removed:
-    - Removed unused helper function
-    - Removed 5 unused imports across 3 files
-    - Removed commented-out experimental code
-
-    Debug artifacts removed:
-    - 4 console.log statements removed
-    - 1 debugger statement removed
-
-    Temp files deleted:
-    - scripts/temp-setup.mjs (one-time script, completed)
-    - test-output.json
-
-    Documentation updated:
-    - README.md: Added new command to Scripts Reference
-    - CLAUDE.md: No updates needed
-
-10. FINAL VERIFICATION (after cleanup):
-
-    CLI Verification:
-    - pnpm test → all pass
-    - pnpm typecheck → pass
-    - pnpm lint → pass
-    - All API endpoints → pass
-
-    UI Verification (feature has UI):
-    - playwright e2e → pass
-    - Chrome MCP browser test:
-      - Primary flow → works
-      - Edit flow → works
-      - Error states → handled correctly
-
-11. Final Requirements Validation:
-    - ✓ Requirement 1 (api + ui verified)
-    - ✓ Requirement 2 (api + ui verified)
-    - ✓ Requirement 3 (e2e tested)
-
-✓ IMPLEMENTATION COMPLETE
-  - 12/12 tasks completed
-  - All requirements satisfied
-  - Milestone CLI tests: all pass
-  - Final CLI tests: pass
-  - Final UI tests: pass
-  - Code cleanup: complete
-  - Ready for review
+✓ IMPLEMENTATION COMPLETE — ready for review
 ```
 
 ## Error Handling
 
-### ERR-000: Orchestrator Direct Action (SELF-CHECK)
-
-**Symptoms:** You (the orchestrator) are about to use Edit/Write/Bash for implementation, debugging, or verification
-**Cause:** Temptation to "just do it quickly" instead of delegating
-
-**Self-Check Questions:**
-- Am I about to edit a `.ts`, `.tsx`, `.js`, `.jsx`, `.css`, `.scss`, or similar file?
-- Am I about to run `pnpm test`, `pnpm lint`, `pnpm build`, or similar commands?
-- Am I about to debug an error by reading logs or running diagnostic commands?
-- Am I about to write implementation code rather than task specs?
-- Did I think "this is too small to bother with a subagent"?
-
-**If YES to any above:**
-1. STOP immediately
-2. Do NOT proceed with the action
-3. Create a task specification instead
-4. Launch a subagent via the Task tool
-5. Wait for subagent to complete and report results
-
-**Remember:** There is no task too small for a subagent. Your job is to orchestrate, not implement, debug, or verify.
-
----
-
 ### ERR-001: Plan File Not Found
 
-**Symptoms:** Command fails at Gate 1
 **Cause:** Invalid path or file doesn't exist
-
-**Resolution:**
-1. Verify the file path is correct
-2. Check for typos in the path
-3. Ensure the file has `.md` extension
-4. Retry with correct path
+**Resolution:** Verify path, check for typos, ensure `.md` extension
 
 ---
 
 ### ERR-002: Subagent Failure
 
-**Symptoms:** Implementer or verifier subagent reports failure
-**Cause:** Various - syntax errors, test failures, missing dependencies
-
+**Cause:** Syntax errors, test failures, missing dependencies
 **Resolution:**
 1. Read the subagent's error output
 2. Identify the specific issue
-3. Fix the issue or adjust the task spec
-4. Re-run the subagent
+3. Adjust the task spec or approach
+4. Re-launch subagent
 
 ---
 
 ### ERR-003: Verification Loop Stuck
 
-**Symptoms:** Verification keeps failing after multiple iterations
 **Cause:** Unclear requirements or conflicting constraints
-
 **Resolution:**
-1. Document the specific verification failure
+1. Document the specific failure
 2. Assess if the requirement is achievable
-3. Either:
-   - Adjust the approach
-   - Flag for manual review
-   - Document as known limitation
+3. Adjust approach or flag for manual review
 
 ---
 
 ### ERR-004: File Conflict
 
-**Symptoms:** Multiple subagents attempting to edit same file
-**Cause:** Incorrect parallel grouping
-
-**Resolution:**
-1. Stop conflicting subagents
-2. Sequence the tasks instead of parallelizing
-3. Re-run in correct order
+**Cause:** Multiple subagents editing the same file
+**Resolution:** Stop conflicting subagents, sequence them instead
 
 ---
 
 ### ERR-005: Cleanup Breaks Tests
 
-**Symptoms:** Tests fail after removing code during cleanup
-**Cause:** Removed code that was actually used (false positive in dead code detection)
-
+**Cause:** Removed code that was actually used
 **Resolution:**
 1. Identify which removal caused the failure from git diff
 2. Restore the removed code
-3. Verify tests pass again
-4. Document why the code appeared dead but wasn't
-5. Re-run cleanup with updated understanding
+3. Document why it appeared dead but wasn't
+4. Re-run cleanup with updated understanding
+
+If uncertain about removal (public API, dynamic imports, reflection): preserve with justification and flag for human review.
 
 ---
 
-### ERR-006: Uncertain About Removal
+### ERR-006: Dev Server Crash or Failure to Start
 
-**Symptoms:** Code looks unused but might be needed (public API, dynamic imports, reflection)
-**Cause:** Dead code detection has limitations with dynamic patterns
+**Cause:** Code changes introduced a runtime error, missing import, broken route, schema mismatch, or dependency issue that prevents the dev server from running.
 
 **Resolution:**
-1. Check if code is part of public API (exported for external use)
-2. Search for dynamic references: `import()`, string-based property access
-3. Check for test fixtures or mocks that reference the code
-4. **When in doubt, preserve with justification** in cleanup report
-5. Flag for human review if still uncertain
+1. Stop all in-progress implementation work — do not write more code against a broken system
+2. Read the server's error output (crash logs, stack trace, startup errors)
+3. Identify the specific change that caused the failure (check recent subagent changes)
+4. Launch a recovery subagent with the error context and a mandate to fix the server
+5. Recovery subagent diagnoses root cause, applies fix, and confirms the server starts and stays running
+6. Only after server health is confirmed, resume implementation work
+7. If the fix requires reverting a subagent's changes, revert and re-implement with a corrected approach
 
 ## Summary
-
-After orchestration completes, provide:
 
 ```
 ✓ ORCHESTRATE COMPLETE
 
-[1-2 sentence summary of what was implemented]
+[1-2 sentence summary]
 
 Milestones: X/Y completed
 Verification:
-  - Milestone CLI tests: all pass
-  - Final CLI tests: pass
-  - Final UI tests: pass | skipped (backend-only)
+  - Implementer self-verification: all pass
+  - Final CLI: pass
+  - Runtime: starts and runs, smoke tests pass
+  - Final UI: pass | skipped (backend-only)
 
 Requirements: X/X satisfied
 
-Code Cleanup (before final verification):
+Code Cleanup:
   - Dead code removed: X items
-  - Debug artifacts removed: Y console.logs, Z debuggers
-  - Temp files deleted: N files
+  - Debug artifacts: Y removed
+  - Temp files: N deleted
   - Documentation: updated | no changes needed
 
 Quality: [brief assessment]
@@ -1267,36 +749,21 @@ Quality: [brief assessment]
 Release Checklist:
 - [ ] All requirements met
 - [ ] All tests passing
+- [ ] Project runs
 - [ ] Code cleanup complete
 - [ ] Documentation updated
 - [ ] Ready for merge
 ```
 
-If issues occurred:
+**"Partially complete" is NOT a valid final state.** If any requirements remain unmet, loop back to create new tasks. Only use the blocked status for genuine external dependencies outside the orchestrator's control:
 
 ```
-⚠ ORCHESTRATE PARTIALLY COMPLETE
+⚠ ORCHESTRATE BLOCKED (external dependency)
 
 Completed: [what succeeded]
-Incomplete: [what failed]
-
-Verification Status:
-  - Milestone CLI: [status]
-  - Cleanup: [status]
-  - Final CLI: [status]
-  - Final UI: [status]
-
-Requirements Gap:
-- [ ] Unsatisfied: [requirement]
-
-Cleanup Gap:
-- [ ] Unresolved: [item that couldn't be safely removed]
-
-Issues:
-- [Issue description]
-
-Next Steps:
-1. [Specific action]
+Blocked By: [specific external blocker]
+Requirements Fully Implemented: X/Y
+Blocked Requirements: [what and why]
 ```
 
 ## References
