@@ -1,6 +1,6 @@
 ---
-name: orchestrate
-description: Implementation coordinator that drives plan execution via subagents
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite, Agent, WebFetch, WebSearch
+description: "Implementation coordinator that drives plan execution via subagents"
 category: orchestration
 version: 2.9
 schema: aitt/commands/cmd.md

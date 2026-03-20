@@ -1,6 +1,6 @@
 ---
-name: plan
-description: Creates structured implementation plans with codebase analysis
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite, Agent, WebFetch, WebSearch
+description: "Creates structured implementation plans with codebase analysis"
 category: workflow
 version: 1.3
 schema: aitt/commands/cmd.md

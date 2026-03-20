@@ -1,3 +1,15 @@
+---
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite
+description: "Produces an exhaustive, structured list of all business features from the codebase"
+category: documentation
+version: 1.0
+schema: aitt/commands/cmd.md
+input:
+  expects: "Path to codebase or description of what to inventory"
+  required: false
+  format: free-text
+---
+
 # Exhaustive Business Feature Inventory for Complex Apps (Mobile, SPA, Stateful Web, Multi-Tier)
 
 ## Goal

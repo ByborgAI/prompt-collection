@@ -1,6 +1,6 @@
 ---
-name: feature-documentation
-description: Generates BDD specification, business flowchart, and technical sequence diagram for a feature
+allowed-tools: Read, Grep, Glob, Bash, TodoWrite, WebFetch, WebSearch
+description: "Generates BDD specification, business flowchart, and technical sequence diagram for a feature"
 category: documentation
 version: 1.1
 schema: .claude/command-schema.md
